@@ -40,7 +40,7 @@ public class MenuActivity extends Activity implements
 
 
         Button btnLogin =(Button) findViewById(R.id.buttonSpotifyLogin);
-        //Aggiungo Sentinella al Bottone di Login
+        //ggiungo Sentinella al Bottone di Login
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
