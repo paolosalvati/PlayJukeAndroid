@@ -23,9 +23,9 @@ import com.spotify.sdk.android.playback.PlayerState;
 public class MenuActivity extends Activity implements
         PlayerNotificationCallback, ConnectionStateCallback {
 
-
+    // TODO: Replace with your client ID
     private static final String CLIENT_ID = "d8e85984e9ac47399e41f0954563cce2";
-
+    // TODO: Replace with your redirect URI
     private static final String REDIRECT_URI = "my-first-android-app-login://callback";
 
     //Get ACS ZUMO Access Token provided by the collaing MenuActivity
@@ -40,7 +40,7 @@ public class MenuActivity extends Activity implements
 
 
         Button btnLogin =(Button) findViewById(R.id.buttonSpotifyLogin);
-        //ggiungo Sentinella al Bottone di Login
+        //Aggiungo Sentinella al Bottone di Login
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

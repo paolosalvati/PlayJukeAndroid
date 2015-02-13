@@ -1,10 +1,14 @@
 package com.example.paolosalvati.demo;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,12 +18,15 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.microsoft.windowsazure.messaging.NotificationHub;
 import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.microsoft.windowsazure.notifications.NotificationsManager;
 import com.spotify.sdk.android.Spotify;
 import com.spotify.sdk.android.playback.Config;
 import com.spotify.sdk.android.playback.Player;
@@ -57,7 +64,13 @@ import com.spotify.sdk.android.playback.PlayerNotificationCallback;
 import com.spotify.sdk.android.playback.PlayerState;
 
 
-public class PlayActivity extends Activity implements  PlayerNotificationCallback {
+public class PlayActivity extends ActionBarActivity implements  PlayerNotificationCallback {
+
+    Context context = this;
+
+    private String SENDER_ID = "823747579189";
+    private GoogleCloudMessaging gcm;
+    private NotificationHub hub;
 
 
     private final static String SERVICE_URI = "http://jukeserver.cloudapp.net/JukeServer.svc/";
@@ -76,7 +89,25 @@ public class PlayActivity extends Activity implements  PlayerNotificationCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_load_play_lists);
+        setContentView(R.layout.activity_play);
+
+
+
+
+        //Connect to GCM GOOGLE NOTIFICATION MESSAGE AND AZURE HUB
+
+
+        NotificationsManager.handleNotifications(this, SENDER_ID, HubHandler.class);
+
+        gcm = GoogleCloudMessaging.getInstance(this);
+
+        String connectionString = "Endpoint=sb://playhub.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=/dLPV75NdWnCRKADlS1nqU0hl2MySOpqDhgJeVQmdJw=";
+        hub = new NotificationHub("playhub", connectionString, this);
+        registerWithNotificationHubs();
+
+
+
+
         Log.i("BBBBB", "1");
         //Save the application Context
         final Context context = this;
@@ -181,4 +212,105 @@ public class PlayActivity extends Activity implements  PlayerNotificationCallbac
     public void onPlaybackError(ErrorType errorType, String s) {
 
     }
+
+
+
+    @SuppressWarnings("unchecked")
+    private void registerWithNotificationHubs() {
+        new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object... params) {
+                try {
+                    String regid = gcm.register(SENDER_ID);
+                    hub.register(regid);
+                } catch (Exception e) {
+                    return e;
+                }
+                return null;
+            }
+        }.execute(null, null, null);
+    }
+
+
+
+
+    //register your activity onResume()
+    @Override
+    public void onResume() {
+        super.onResume();
+        context.registerReceiver(mMessageReceiver, new IntentFilter("unique_name"));
+    }
+
+    //Must unregister onPause()
+    @Override
+    protected void onPause() {
+        super.onPause();
+        context.unregisterReceiver(mMessageReceiver);
+    }
+    //This is the handler that will manager to process the broadcast intent
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("onReceive","STARTAA");
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("message");
+
+            //Recupero il Bottone di Logout tramite l'ID
+            //TextView txtMessage =(TextView) findViewById(R.id.message);
+            //txtMessage.setText(message);
+
+            Log.d("PAOLOA",message);
+            if (message != null) {
+                try {
+
+                    PlayListObject playlist = new PlayListObject();
+                    //PARSO IL JSON
+                    JSONObject jsonPlayListObj = new JSONObject(message);
+                    playlist.setProvider(jsonPlayListObj.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
+                    playlist.setPoweredby(jsonPlayListObj.optString(PlayListObject.TAG_POWEREDBY, "defaultValue").toString());
+                    playlist.setUsernameID(jsonPlayListObj.optString(PlayListObject.TAG_USERNAMEID, "defaultValue").toString());
+                    playlist.setPlaylistuserID(jsonPlayListObj.optString(PlayListObject.TAG_PLAYLISTUSERID, "defaultValue").toString());
+                    playlist.setPlaylistID(jsonPlayListObj.optString(PlayListObject.TAG_PLAYLISTID, "defaultValue").toString());
+                    playlist.setPlaylistName(jsonPlayListObj.optString(PlayListObject.TAG_PLAYLISTNAME, "defaultValue").toString());
+
+
+                    // Getting JSON Array node
+                    JSONArray jsonArrayPlaylist = jsonPlayListObj.getJSONArray(PlayListObject.TAG_TRACKS);
+                    ArrayList<TrackObject> ArrayPlayList = new ArrayList<TrackObject>();
+                    // looping through All jsonArrayPlaylist
+                    for (int i = 0; i < jsonArrayPlaylist.length(); i++) {
+
+                        JSONObject c = jsonArrayPlaylist.getJSONObject(i);
+
+                        TrackObject track = new TrackObject();
+                        track.setTrackID(c.optString(TrackObject.TAG_TRACKID,"defaultValue").toString());
+                        track.setTrackName(c.optString(TrackObject.TAG_TRACKNAME, "defaultValue").toString());
+                        track.setTotalLike(c.optString(TrackObject.TAG_TOTALLIKE, "0").toString());
+                        track.setPosition(c.optString(TrackObject.TAG_POSITION, "SAME").toString());
+                        ArrayPlayList.add(track);
+
+                    }
+
+
+                    ListAdapter playListAdapter = null;
+                    playListAdapter = new PlayAdapter(ArrayPlayList);
+
+                    TextView playlistTitle = (TextView) findViewById(R.id.title);
+                    playlistTitle.setText(playlist.getPlaylistName());
+                    ListView allPlayLists = (ListView) findViewById(R.id.tracks);
+                    allPlayLists.setAdapter(playListAdapter);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d("PAOLOA",e.toString());
+                }
+
+
+            }
+        }
+
+
+    };
+
 }
