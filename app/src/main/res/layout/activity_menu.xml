@@ -22,8 +22,16 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Login"
+            android:text="PUB: Load Playlist"
             android:id="@+id/buttonSpotifyLogin"
+            android:layout_gravity="right"
+            android:gravity="right" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CLIENT: Vote Playlist"
+            android:id="@+id/buttonClient"
             android:layout_gravity="right"
             android:gravity="right" />
     </LinearLayout>

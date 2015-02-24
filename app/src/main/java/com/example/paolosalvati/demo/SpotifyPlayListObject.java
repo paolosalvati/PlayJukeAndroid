@@ -31,7 +31,7 @@ public class SpotifyPlayListObject {
         private String tracksHref;
         private int tracksTotal;
         private String playlisturi;
-        private SpotifyUserObject user;
+
 
         public boolean getCollaborative() {
         return collaborative;
@@ -80,10 +80,7 @@ public class SpotifyPlayListObject {
         this.playlisturi = playlisturi;
         }
 
-        public SpotifyUserObject getUser() {
-            return user;
-        }
-        public void setUser(SpotifyUserObject user) {   this.user = user;  }
+
 
 
     }

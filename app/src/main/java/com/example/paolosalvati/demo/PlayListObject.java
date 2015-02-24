@@ -14,26 +14,25 @@ public class PlayListObject {
 
 
     // TAG for JSON parsing
+    public static final String TAG_PLAYLIST = "playlist";
     public static final String TAG_PROVIDER = "provider";
-    public static final String TAG_POWEREDBY = "so";
+
     public static final String TAG_VERSION = "version";
-    public static final String TAG_MAC = "mac";
-    public static final String TAG_USERNAMEID = "usernameID";
+
+
     public static final String TAG_PLAYLISTUSERID = "playlistuserID";
-    public static final String TAG_PLAYLISTID="playListId";
+    public static final String TAG_PLAYLISTID="playlistID";
     public static final String TAG_PLAYLISTNAME="playlistname";
     public static final String TAG_TRACKS="tracks";
 
     //Membri
     private String provider;
-    private String poweredby;
     private String version;
-    private String mac;
-    private String usernameID;
+
     private String playlistuserID;
     private String playlistID;
     private String playlistname;
-    private List<TrackObject> playlist;
+   // private List<TrackObject> tracks;
 
 
     //Getter and Setter
@@ -44,12 +43,7 @@ public class PlayListObject {
         this.provider= provider;
     }
 
-    public String getPoweredby() {
-        return poweredby;
-    }
-    public void setPoweredby(String poweredby) {
-        this.poweredby = poweredby;
-    }
+
 
     public String getVersion() {
         return version;
@@ -58,12 +52,6 @@ public class PlayListObject {
         this.version = version;
     }
 
-    public String getMac() {
-        return mac;
-    }
-    public void setMac(String mac) {
-        this.mac = mac;
-    }
 
 
     public String getPlaylistuserID() {
@@ -73,12 +61,7 @@ public class PlayListObject {
         this.playlistuserID = playlistuserID;
     }
 
-    public String getUsernameID() {
-        return playlistID;
-    }
-    public void setUsernameID(String playlistID) {
-        this.playlistID = playlistID;
-    }
+
 
 
     public String getPlaylistID() {
@@ -95,11 +78,11 @@ public class PlayListObject {
         this.playlistname= playlistname;
     }
 
-    public List<TrackObject> getPlaylist() {
-        return playlist;
-    }
-    public void setPlaylist(List<TrackObject> playlist) {
-        this.playlist= playlist;
-    }
+   // public List<TrackObject> getTracks() {
+   //     return tracks;
+    //}
+    //public void setTracks(List<TrackObject> tracks) {
+    //    this.tracks= tracks;
+    //}
 
 }

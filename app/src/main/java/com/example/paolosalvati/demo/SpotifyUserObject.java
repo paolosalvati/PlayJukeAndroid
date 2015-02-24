@@ -18,10 +18,6 @@ public class SpotifyUserObject {
         private String email;
         private String id;
 
-        private String wifiBSSID;
-        private String wifiMAC;
-        private String wifiSSID;
-
 
         public String getId() {
             return id;
@@ -52,28 +48,5 @@ public class SpotifyUserObject {
         }
 
 
-
-        public String getwifiBSSID() {
-            return wifiBSSID;
-        }
-        public void setwifiBSSID(String wifiBSSID) {
-            this.wifiBSSID = wifiBSSID;
-        }
-
-
-        public String getwifiMAC() {
-            return wifiMAC;
-        }
-        public void setwifiMAC(String wifiMAC) {
-            this.wifiMAC = wifiMAC;
-        }
-
-
-        public String getwifiSSID() {
-            return wifiSSID;
-        }
-        public void setwifiSSID(String wifiSSID) {
-            this.wifiSSID = wifiSSID;
-        }
 
     }

@@ -59,12 +59,25 @@ public class PlayAdapter extends BaseAdapter {
         }
         TextView nomeTrack=(TextView)convertView.findViewById(R.id.layout_track_name);
         nomeTrack.setText("NOME: "+playlist.get(position).getTrackName());
+
         TextView idTrack=(TextView)convertView.findViewById(R.id.layout_track_id);
         idTrack.setText("ID: "+playlist.get(position).getTrackID());
-        TextView totaLikeTrack=(TextView)convertView.findViewById(R.id.layout_track_totallike);
-        totaLikeTrack.setText("LIKE: "+playlist.get(position).getTotalLike());
+
+        TextView totaLikesTrack=(TextView)convertView.findViewById(R.id.layout_track_likes);
+        totaLikesTrack.setText("LIKES: "+((Object) playlist.get(position).getLikes()).toString());
+
+        TextView totaDislikesTrack=(TextView)convertView.findViewById(R.id.layout_track_dislikes);
+        totaDislikesTrack.setText("DISLIKES: "+((Object) playlist.get(position).getDislikes()).toString());
+
         TextView positionTrack=(TextView)convertView.findViewById(R.id.layout_track_position);
-        positionTrack.setText("POSITION: "+playlist.get(position).getPosition());
+        positionTrack.setText("POSITION: "+ ((Object) playlist.get(position).getPosition()).toString());
+
+        TextView albumTrack=(TextView)convertView.findViewById(R.id.layout_track_album);
+        albumTrack.setText("ALBUM: "+playlist.get(position).getAlbum());
+
+        TextView artistTrack=(TextView)convertView.findViewById(R.id.layout_track_artist);
+        artistTrack.setText("ARTIST: "+playlist.get(position).getArtist());
+
         return convertView;
     }
 }

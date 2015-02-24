@@ -11,10 +11,82 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="PLAYLIST NAME"
+        android:textColor="#04cbde"
+        android:id="@+id/alltracks"
+        android:layout_alignParentLeft="true"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="NOTA: Il primo caricamento sarà da WCF e non da HUB....in attesa del push....."
         android:id="@+id/title" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="CURRT TRAK"
+        android:textColor="#04cbde"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="aaa"
+
+        android:id="@+id/currentrack" />
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/songProgressBar"
+        android:layout_gravity="right"
+        android:indeterminate="false" />
+
+    <!-- Timer Display -->
+    <LinearLayout
+        android:id="@+id/timerDisplay"
+        android:layout_above="@id/songProgressBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp">
+        <!-- Current Duration Label -->
+        <TextView
+            android:id="@+id/songCurrentDurationLabel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:textColor="#04cbde"
+            android:textStyle="bold"/>
+        <!-- Total Duration Label -->
+        <TextView
+            android:id="@+id/songTotalDurationLabel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:textColor="#04cbde"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="ALL TRACKS"
+        android:textColor="#04cbde"
+        android:id="@+id/alltracks"
+        android:layout_alignParentLeft="true"/>
 
     <ListView
         android:layout_width="wrap_content"
