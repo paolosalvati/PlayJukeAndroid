@@ -69,14 +69,7 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".aaa"
-            android:label="@string/title_activity_aaa" >
-        </activity>
-        <activity
-            android:name=".aaaa"
-            android:label="@string/title_activity_aaaa" >
-        </activity>
+
     </application>
 
 </manifest>
