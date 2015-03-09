@@ -3,10 +3,19 @@
 
     <string name="app_name">Demo</string>
     <string name="hello_world">hello_world</string>
-
     <string name="main_menu_pub_message">Are you Pub Music Manager? Keep sharing your PlayList!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_load_play_lists">LoadPlayListsActivity</string>
     <string name="title_activity_menu">MenuActivity</string>
-
+    <string name="title_activity_aaa">aaa</string>
+    <string name="title_activity_aaaa">aaaa</string>
+    <!--ZUMO CONNECTION-->
+    <string name="azure_zumo_url">https://playjuke.azure-mobile.net/</string>
+    <string name="azure_zumo_key">faMsCpUEYWcknZULBGywlrFxPBDqDM33</string>
+    <!--SPOTIFY CONNECTION-->
+    <string name="spotify_client_id">"d8e85984e9ac47399e41f0954563cce2"</string>
+    <string name="spotify_redirect_uri">my-first-android-app-login://callback</string>
+    <!--AZURE WCF-->
+    <string name="azure_wcf_service_uri">http://jukeserver.cloudapp.net/JukeSvc.svc/</string>
+    CLIENT_ID
 </resources>

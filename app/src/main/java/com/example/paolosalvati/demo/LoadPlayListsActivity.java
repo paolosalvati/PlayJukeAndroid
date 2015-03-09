@@ -38,14 +38,15 @@ import java.util.List;
 
 public class LoadPlayListsActivity extends Activity {
 
-    private final static String SERVICE_URI = "http://jukeserver.cloudapp.net/JukeSvc.svc/";
-
-
-
+    private  String SERVICE_URI;// = "http://jukeserver.cloudapp.net/JukeSvc.svc/";
 
     // contacts JSONArray
     JSONArray jsonArrayALLPlaylists = null;
     JSONArray jsonArrayALLTracks = null;
+
+    JSONObject jsonObjectToSpotify;
+    JSONArray jsonArrayToSpotify;
+
 
     private ListAdapter playListAdapter = null;
 
@@ -55,6 +56,8 @@ public class LoadPlayListsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load_play_lists);
+
+        SERVICE_URI = getApplication().getString(R.string.azure_wcf_service_uri);
 
         final GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
         final MobileServiceClient zumoClient = globalObjects.getZumoClient();
@@ -123,6 +126,7 @@ public class LoadPlayListsActivity extends Activity {
                                 JSONObject jsonUserObj = new JSONObject(jsonApiUserResponse);
                                 spotifyUserObject.setCountry(jsonUserObj.getString(SpotifyUserObject.TAG_COUNTRY));
                                 spotifyUserObject.setDisplayname(jsonUserObj.getString(SpotifyUserObject.TAG_DISPLAY_NAME));
+                                spotifyUserObject.setDisplayname(jsonUserObj.getString(SpotifyUserObject.TAG_DISPLAY_NAME));
                                 spotifyUserObject.setEmail(jsonUserObj.getString(SpotifyUserObject.TAG_EMAIL));
                                 spotifyUserObject.setId(jsonUserObj.getString(SpotifyUserObject.TAG_ID));
 
@@ -168,6 +172,7 @@ public class LoadPlayListsActivity extends Activity {
                                                                         playListObject.setProvider("Spotify");
                                                                         playListObject.setVersion("1.0");
                                                                         playListObject.setPlaylistID(playlistItem.getID());
+                                                                        playListObject.setPlaylistuserID(spotifyUserObject.getId());
                                                                         playListObject.setPlaylistName(playlistItem.getName());
                                                                         playListObject.setProvider("Spotify");
                                                                         playListObject.setVersion("1.0");
@@ -210,8 +215,8 @@ public class LoadPlayListsActivity extends Activity {
                                                                                                     track.setDislikes(2);
                                                                                                     track.setTrackID(spotifyTrackObject.getID());
                                                                                                     track.setTrackName(spotifyTrackObject.getName());
-                                                                                                    track.setArtist("Gigetto");
-                                                                                                    track.setAlbum("Del meglio del suo meglio");
+                                                                                                    track.setArtist("a");
+                                                                                                    track.setAlbum("a");
                                                                                                     trackInfos.add(track);
 
                                                                                                 }
@@ -226,6 +231,7 @@ public class LoadPlayListsActivity extends Activity {
                                                                                                 json_user.put(UserObject.TAG_MAC, userObject.getMac());
                                                                                                 json_user.put(UserObject.TAG_BSSID, userObject.getSsid());
                                                                                                 json_user.put(UserObject.TAG_AUTHPROVIDER,userObject.getAuthProvider());
+
                                                                                                 json_user.put(UserObject.TAG_USERNAMEID, userObject.getUsernameID());
                                                                                                 json_user.put(UserObject.TAG_OS, userObject.getOs());
 
@@ -236,33 +242,60 @@ public class LoadPlayListsActivity extends Activity {
                                                                                                 json_playlist.put(PlayListObject.TAG_PLAYLISTID, playListObject.getPlaylistID());
                                                                                                 json_playlist.put(PlayListObject.TAG_PLAYLISTNAME, playListObject.getPlaylistName());
                                                                                                 json_playlist.put(PlayListObject.TAG_PLAYLISTUSERID, playListObject.getPlaylistuserID());
-
+                                                                                                Log.d("WebInvoke user",PlayListObject.TAG_PLAYLISTUSERID+ playListObject.getPlaylistuserID());
                                                                                                 json.put(PlayListObject.TAG_PLAYLIST, json_playlist);
 
                                                                                                 // Creating a JSONArray
-                                                                                                JSONArray arr = new JSONArray();
+                                                                                                JSONArray arr_to_wcf = new JSONArray();
+                                                                                                //String arr_to_spotify ="{\"uris\": [";
+                                                                                                String arr_to_spotify ="";
                                                                                                 int pos = 0;
                                                                                                 //Creating the element to populate the array
                                                                                                 for (TrackObject track : trackInfos) {
 
                                                                                                     Log.i("PaoloB:", "5.1");
                                                                                                     JSONObject element = new JSONObject();
-                                                                                                    element.put(TrackObject.TAG_TRACKNAME, track.getTrackName());
+
+                                                                                                    String trackName = track.getTrackName();
+
+                                                                                                    String[] invalid_characters = {"&",".", "#", "$", "!", "?", "'", ","};
+
+                                                                                                    for(String str : invalid_characters){
+                                                                                                        trackName = trackName.replace(str, "");
+                                                                                                    }
+
+
+
+
+                                                                                                    element.put(TrackObject.TAG_TRACKNAME, trackName);
                                                                                                     element.put(TrackObject.TAG_TRACKID, track.getTrackID());
                                                                                                     element.put(TrackObject.TAG_POSITION, pos);
                                                                                                     element.put(TrackObject.TAG_ALBUM, track.getAlbum());
                                                                                                     element.put(TrackObject.TAG_ARTIST, track.getArtist());
 
                                                                                                     // Put it in the array
-                                                                                                    arr.put(element);
+                                                                                                    arr_to_wcf.put(element);
+                                                                                                    //{"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
+
+                                                                                                    //Uri to spotify
+                                                                                                    if(pos==0)
+
+                                                                                                        arr_to_spotify=arr_to_spotify+"spotify:track:"+track.getTrackID();
+                                                                                                    else
+                                                                                                        arr_to_spotify=arr_to_spotify+",spotify:track:"+track.getTrackID();
+
+
                                                                                                     pos = pos + 1;
                                                                                                 }
 
 
                                                                                                 // Put the array and other fileds in the root JSONObject
-                                                                                                json.put(PlayListObject.TAG_TRACKS, arr);
+                                                                                                json.put(PlayListObject.TAG_TRACKS, arr_to_wcf);
 
 
+                                                                                               // arr_to_spotify=arr_to_spotify+"]}";
+                                                                                                arr_to_spotify=arr_to_spotify+",spotify:track:3wRJ8kRFf3czgTR5QePcKP";
+                                                                                                Log.d("arr_to_spotify",arr_to_spotify);
                                                                                                 // Get the JSON String
                                                                                                 final String s = json.toString();
                                                                                                                                                                                               // Get formatted and indented JSON String
@@ -285,10 +318,14 @@ public class LoadPlayListsActivity extends Activity {
                                                                                                 StringEntity entity = null;
                                                                                                 try {
                                                                                                     s_json = s.toString();
+
+                                                                                                   /*
                                                                                                     s_json = s_json.replaceAll("'", "");
                                                                                                     s_json = s_json.replaceAll("\'", "");
                                                                                                     s_json = s_json.replaceAll("/?", "");
                                                                                                     s_json = s_json.replaceAll("/&", "");
+                                                                                                     */
+
 
                                                                                                     Log.d("WebInvoke: json", s_json);
 
@@ -309,6 +346,90 @@ public class LoadPlayListsActivity extends Activity {
                                                                                                     Log.d("WebInvoke", "KO : " + e.toString());
                                                                                                 }
                                                                                                 Log.d("WebInvoke", "OK : " + httpResponse.getStatusLine().toString());
+
+
+
+
+
+                                                                                                //INIZIO RECUPERO LE TRACKS
+/*
+                                                                                                input.addProperty("User", spotifyUserObject.getId());
+                                                                                                input.addProperty("Playlist", playlistItem.getID());
+                                                                                                input.addProperty("Token", spotifyToken);
+                                                                                                */
+                                                                                                input.addProperty("Tracks",arr_to_spotify);
+                                                                                                //2.A]Invoke ZUMO CUsom API to get playlist'infos
+                                                                                                zumoClient.invokeApi(
+                                                                                                        "api_pjk_spotify_update_playlist"
+                                                                                                        , input
+                                                                                                        , HttpPost.METHOD_NAME
+                                                                                                        , null
+                                                                                                        , new ApiJsonOperationCallback() {
+                                                                                                            @Override
+                                                                                                            public void onCompleted(JsonElement jsonData, Exception error, ServiceFilterResponse response) {
+                                                                                                                String jsonApiTracksResponse = response.getContent().toString();
+                                                                                                                Log.i("Paolo:api_pjk_spotify_update_playlist:Track", response.getContent().toString());// getAsJsonObject().getAsString());
+
+                                                                                                            }
+                                                                                                  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

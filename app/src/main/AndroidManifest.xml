@@ -5,25 +5,25 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
-
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:name="com.example.paolosalvati.demo.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-    <uses-permission android:name="com.example.paolosalvati.demo.permission.C2D_MESSAGE"/>
+    <permission
+        android:name="com.example.paolosalvati.demo.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
 
+    <uses-permission android:name="com.example.paolosalvati.demo.permission.C2D_MESSAGE" />
 
     <application
+        android:name=".GlobalObjects"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name="GlobalObjects">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,37 +34,49 @@
             android:name=".LoadPlayListsActivity"
             android:label="@string/title_activity_load_play_lists" >
         </activity>
-
         <activity
             android:name=".PlayActivity"
             android:label="PlayActivity" >
         </activity>
         <activity
+            android:name=".ClientActivity"
+            android:label="ClientActivity" >
+        </activity>
+        <activity
             android:name=".MenuActivity"
             android:label="@string/title_activity_menu"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance" >
             // An intent filter that will receive the response from the authentication service
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
                     android:host="callback"
-                    android:scheme="my-first-android-app-login"/>
+                    android:scheme="my-first-android-app-login" />
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.microsoft.windowsazure.notifications.NotificationsBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+        <receiver
+            android:name="com.microsoft.windowsazure.notifications.NotificationsBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.example.paolosalvati.demo" />
             </intent-filter>
         </receiver>
 
-
-</application>
+        <activity
+            android:name=".aaa"
+            android:label="@string/title_activity_aaa" >
+        </activity>
+        <activity
+            android:name=".aaaa"
+            android:label="@string/title_activity_aaaa" >
+        </activity>
+    </application>
 
 </manifest>

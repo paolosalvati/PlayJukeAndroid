@@ -16,7 +16,7 @@ import com.microsoft.windowsazure.mobileservices.UserAuthenticationCallback;
 
 import java.net.MalformedURLException;
 
-//Cache authentication tokens on the client
+
 
 
 public class MainActivity extends ActionBarActivity {
@@ -33,12 +33,13 @@ public class MainActivity extends ActionBarActivity {
             // Creao l'Istanza ZUMO using the provided
             // Mobile Service URL and key
             mClient = new MobileServiceClient(
-                    "https://playjuke.azure-mobile.net/",       //ZUMO URL
-                    "faMsCpUEYWcknZULBGywlrFxPBDqDM33",         //ZUMO KEY
+                    this.getString(R.string.azure_zumo_url),            //ZUMO URL
+                    this.getString(R.string.azure_zumo_key),            //ZUMO KEY
                     this);
-
+        Log.d("juve",this.getString(R.string.azure_zumo_url));
+            Log.d(  "juve",  this.getString(R.string.azure_zumo_key));
         } catch (MalformedURLException e) {
-            Log.e("onCreate",e.getMessage().toString());
+            Log.e("MainActivity:onCreate","Can not conntect to ZUMO :"+e.getMessage().toString());
             return;
         }
 
@@ -56,7 +57,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-
+    /**
+     * Authenticate User to ZUMO Client
+     */
     private void userLogin()
     {
 
@@ -77,19 +80,22 @@ public class MainActivity extends ActionBarActivity {
                                     //Set User
                                     mClient.setCurrentUser(user);
 
-
-                                    Intent loadMenuActivityIntent = new Intent(getApplicationContext(), MenuActivity.class);
-                                    //loadMenuActivityIntent.putExtra("ZUMO_ACS_USER_ID",mClient.getCurrentUser().getUserId());
-                                    //loadMenuActivityIntent.putExtra("ZUMO_ACS_TOKEN",mClient.getCurrentUser().getAuthenticationToken());
-
-
                                     //Setto la connessione ad Acure ZUMO client come variabile globale dell appplicazione
                                     GlobalObjects zumoClient = ((GlobalObjects) getApplicationContext());
                                     zumoClient.setZumoClient(mClient);
+
+                                    Log.d("juve cacca","1");
+                                    //Lancio la Menu Activity
+                                    Intent loadMenuActivityIntent = new Intent(getApplicationContext(), MenuActivity.class);
+                                    //loadMenuActivityIntent.putExtra("ZUMO_ACS_USER_ID",mClient.getCurrentUser().getUserId());
+                                    //loadMenuActivityIntent.putExtra("ZUMO_ACS_TOKEN",mClient.getCurrentUser().getAuthenticationToken());
+                                    Log.d("juve cacca","2");
                                     startActivity(loadMenuActivityIntent);
+                                    Log.d("juve cacca","3");
+
 
                                 } else {
-                                    Log.e("PAOLO:MainActivity:userLogin", "User did not login successfully");
+                                    Log.e("MainActivity:userLogin", "User did not login successfully");
                                 }
 
 

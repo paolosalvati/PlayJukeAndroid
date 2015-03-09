@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="layout_track_name"
+        android:id="@+id/id_track"
+        android:visibility="invisible"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="layout_track_name"
+        android:id="@+id/layout_track_name"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_track_id"
+        android:text="id"
+        android:layout_below="@id/layout_track_name"
+
+        android:layout_alignLeft="@id/layout_track_name"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_track_likes"
+        android:text="likes"
+        android:layout_below="@id/layout_track_id"
+        android:layout_alignLeft="@id/layout_track_id"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_track_dislikes"
+        android:text="dilikes"
+        android:layout_below="@id/layout_track_likes"
+        android:layout_alignLeft="@id/layout_track_likes"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_track_position"
+        android:text="position"
+        android:layout_below="@id/layout_track_dislikes"
+        android:layout_alignLeft="@id/layout_track_dislikes"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_track_album"
+        android:text="album"
+        android:layout_below="@id/layout_track_position"
+        android:layout_alignLeft="@id/layout_track_position"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_track_artist"
+        android:text="artist"
+        android:layout_below="@id/layout_track_album"
+        android:layout_alignLeft="@id/layout_track_album"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_track_rank"
+        android:text="rank"
+        android:layout_below="@id/layout_track_artist"
+        android:layout_alignLeft="@id/layout_track_artist"/>
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/track_btn_like"
+        android:layout_below="@id/layout_track_rank"
+        android:layout_alignLeft="@id/layout_track_rank"
+        android:src="@android:drawable/ic_media_play"
+        android:onClick="LikeClickHandler" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/track_btn_dislike"
+        android:layout_below="@id/track_btn_like"
+        android:layout_alignLeft="@id/track_btn_like"
+        android:src="@android:drawable/ic_menu_share"
+        android:onClick="DislikeClickHandler" />
+
+</RelativeLayout>

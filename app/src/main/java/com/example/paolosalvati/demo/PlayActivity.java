@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 
@@ -102,8 +104,10 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
     JSONArray jsonArrayINFOPlaylist = null;
     int trackPos =0;
 
-    ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
-    ArrayList<HashMap<String, String>> songsListHub = new ArrayList<HashMap<String, String>>();
+
+    ArrayList<TrackObject> ArrayPlayList = new ArrayList<TrackObject>();
+    //ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+    //ArrayList<HashMap<String, String>> songsListHub = new ArrayList<HashMap<String, String>>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,8 +187,13 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
             // Getting JSON Array node
             JSONArray jsonArrayPlaylist = jsonPlayListObj.getJSONArray(PlayListObject.TAG_TRACKS);
-            ArrayList<TrackObject> ArrayPlayList = new ArrayList<TrackObject>();
+
             // looping through All jsonArrayPlaylist
+
+
+
+
+
 
 
             for (int i = 0; i < jsonArrayPlaylist.length(); i++) {
@@ -207,13 +216,26 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
                 song.put("songPath",  track.getTrackID());
 
                 // Adding each song to SongList
-                songsList.add(song);
+               // songsList.add(song);
             }
 
 
 
             TextView playlistTitle = (TextView) findViewById(R.id.title);
             playlistTitle.setText(playlist.getPlaylistName());
+
+
+            Collections.sort(ArrayPlayList, new Comparator<TrackObject>() {
+                public int compare(TrackObject obj1, TrackObject obj2) {
+                    // TODO Auto-generated method stub
+                    int obj1_poistion = obj1.getPosition();
+                    int obj2_poistion = obj2.getPosition();
+                    ;
+
+                    return (obj1_poistion < obj2_poistion) ? -1 : (obj1_poistion > obj2_poistion) ? 1 : 0;
+                }
+            });
+
 
             playListAdapter = new PlayAdapter(ArrayPlayList);
             playlistView = (ListView) findViewById(R.id.tracks);
@@ -296,13 +318,13 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
 */
 
-            Log.d("uuuu",songsList.get(trackPos).get("songPath"));
-                mPlayer.play("spotify:track:" + songsList.get(trackPos).get("songPath"));
+                Log.d("uuuu",   ArrayPlayList.get(trackPos).getTrackName());
+                mPlayer.play("spotify:track:" + ArrayPlayList.get(trackPos).getTrackID());
 
                 // set Progress bar values
                 songProgressBar.setProgress(0);
                 songProgressBar.setMax(100);
-                currenTrack.setText(songsList.get(trackPos).get("songTitle"));
+                currenTrack.setText(ArrayPlayList.get(trackPos).getTrackName());
 
 
 
@@ -363,7 +385,7 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
         Log.d("PlayActivity", "Playback event received: " + eventType.name());
         switch (eventType) {
-           case TRACK_START: Log.i("onPlaybackEventTRACK_START", songsList.get(trackPos).get("songTitle"));
+           case TRACK_START: Log.i("onPlaybackEventTRACK_START", ArrayPlayList.get(trackPos).getTrackName());
 
 
                 break;
@@ -401,10 +423,10 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
                 // Displaying time completed playing
                // songCurrentDurationLabel.setText(""+utils.milliSecondsToTimer(currentDuration));
                 break;
-            case TRACK_END: Log.i("onPlaybackEventTRACK_END", songsList.get(trackPos).get("songTitle"));
+            case TRACK_END: Log.i("onPlaybackEventTRACK_END", ArrayPlayList.get(trackPos).getTrackName());
                 trackPos =trackPos+1;
-                mPlayer.play("spotify:track:" + songsList.get(trackPos).get("songPath"));
-                currenTrack.setText(songsList.get(trackPos).get("songTitle"));
+                mPlayer.play("spotify:track:" + ArrayPlayList.get(trackPos).getTrackID());
+                currenTrack.setText( ArrayPlayList.get(trackPos).getTrackName());
                 break;
 
             default:
@@ -517,14 +539,26 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
                         song.put("songPath",  track.getTrackID());
 
                         // Adding each song to SongList
-                        songsListHub.add(song);
+                        //songsListHub.add(song);
 
                     }
 
-                    songsList = songsListHub;
+                    //songsList = songsListHub;
 
                     TextView playlistTitle = (TextView) findViewById(R.id.title);
                     playlistTitle.setText(playlist.getPlaylistName());
+
+
+                    Collections.sort(ArrayPlayList, new Comparator<TrackObject>() {
+                        public int compare(TrackObject obj1, TrackObject obj2) {
+                            // TODO Auto-generated method stub
+                            int obj1_poistion = obj1.getPosition();
+                            int obj2_poistion = obj2.getPosition();
+                            ;
+
+                            return (obj1_poistion < obj2_poistion) ? -1 : (obj1_poistion > obj2_poistion) ? 1 : 0;
+                        }
+                    });
 
                     playListAdapter = new PlayAdapter(ArrayPlayList);
                     playlistView = (ListView) findViewById(R.id.tracks);
