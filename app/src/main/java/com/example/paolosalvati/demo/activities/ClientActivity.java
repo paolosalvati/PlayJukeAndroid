@@ -1,46 +1,32 @@
-package com.example.paolosalvati.demo;
+package com.example.paolosalvati.demo.activities;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.StrictMode;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.paolosalvati.demo.utilities.GlobalObjects;
+import com.example.paolosalvati.demo.handlers.HubHandler;
+import com.example.paolosalvati.demo.adapters.PlayClientAdapter;
+import com.example.paolosalvati.demo.dataClasses.PlayListObject;
+import com.example.paolosalvati.demo.R;
+import com.example.paolosalvati.demo.dataClasses.TrackObject;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.internal.ca;
-import com.google.android.gms.internal.ge;
-import com.google.gson.JsonElement;
 import com.microsoft.windowsazure.messaging.NotificationHub;
-import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
-import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.notifications.NotificationsManager;
-import com.spotify.sdk.android.Spotify;
-import com.spotify.sdk.android.playback.Config;
-import com.spotify.sdk.android.playback.Player;
-import com.spotify.sdk.android.playback.PlayerNotificationCallback;
-import com.spotify.sdk.android.playback.PlayerState;
-import com.spotify.sdk.android.playback.PlayerStateCallback;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -55,8 +41,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 
 
 public class ClientActivity extends ListActivity {

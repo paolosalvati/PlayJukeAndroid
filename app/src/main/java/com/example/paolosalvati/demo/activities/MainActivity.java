@@ -1,4 +1,4 @@
-package com.example.paolosalvati.demo;
+package com.example.paolosalvati.demo.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.paolosalvati.demo.utilities.GlobalObjects;
+import com.example.paolosalvati.demo.R;
 import com.microsoft.windowsazure.mobileservices.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
@@ -33,11 +35,11 @@ public class MainActivity extends ActionBarActivity {
             // Creao l'Istanza ZUMO using the provided
             // Mobile Service URL and key
             mClient = new MobileServiceClient(
-                    this.getString(R.string.azure_zumo_url),            //ZUMO URL
-                    this.getString(R.string.azure_zumo_key),            //ZUMO KEY
+                    getResources().getString(R.string.azure_zumo_url),    //ZUMO URL
+                    getResources().getString(R.string.azure_zumo_key),    //ZUMO KEY
+                   // this.getString(R.string.azure_zumo_url),            //ZUMO URL
+                   // this.getString(R.string.azure_zumo_key),            //ZUMO KEY
                     this);
-        Log.d("juve",this.getString(R.string.azure_zumo_url));
-            Log.d(  "juve",  this.getString(R.string.azure_zumo_key));
         } catch (MalformedURLException e) {
             Log.e("MainActivity:onCreate","Can not conntect to ZUMO :"+e.getMessage().toString());
             return;
@@ -50,8 +52,8 @@ public class MainActivity extends ActionBarActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Lancio l'Autenticazione via ACS sul Mobile Service di Azure
-                userLogin();
+                                            //Lancio l'Autenticazione via ACS sul Mobile Service di Azure
+                                            userLogin();
             }
         });
     }
@@ -84,14 +86,14 @@ public class MainActivity extends ActionBarActivity {
                                     GlobalObjects zumoClient = ((GlobalObjects) getApplicationContext());
                                     zumoClient.setZumoClient(mClient);
 
-                                    Log.d("juve cacca","1");
+
                                     //Lancio la Menu Activity
                                     Intent loadMenuActivityIntent = new Intent(getApplicationContext(), MenuActivity.class);
                                     //loadMenuActivityIntent.putExtra("ZUMO_ACS_USER_ID",mClient.getCurrentUser().getUserId());
                                     //loadMenuActivityIntent.putExtra("ZUMO_ACS_TOKEN",mClient.getCurrentUser().getAuthenticationToken());
-                                    Log.d("juve cacca","2");
+
                                     startActivity(loadMenuActivityIntent);
-                                    Log.d("juve cacca","3");
+
 
 
                                 } else {

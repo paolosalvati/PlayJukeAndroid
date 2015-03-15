@@ -1,12 +1,17 @@
-package com.example.paolosalvati.demo;
+package com.example.paolosalvati.demo.utilities;
 
 import android.util.Log;
+
+
 
 /**
  * Created by Paolo on 23/02/2015.
  */
 
 public class Utilities {
+
+
+
 
     /**
      * Function to convert milliseconds time to

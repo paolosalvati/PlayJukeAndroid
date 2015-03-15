@@ -1,69 +1,47 @@
-package com.example.paolosalvati.demo;
+package com.example.paolosalvati.demo.activities;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.paolosalvati.demo.utilities.GlobalObjects;
+import com.example.paolosalvati.demo.handlers.HubHandler;
+import com.example.paolosalvati.demo.adapters.PlayAdapter;
+import com.example.paolosalvati.demo.dataClasses.PlayListObject;
+import com.example.paolosalvati.demo.R;
+import com.example.paolosalvati.demo.dataClasses.TrackObject;
+import com.example.paolosalvati.demo.utilities.Utilities;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.microsoft.windowsazure.messaging.NotificationHub;
-import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
-import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
-import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.notifications.NotificationsManager;
 import com.spotify.sdk.android.Spotify;
 import com.spotify.sdk.android.playback.Config;
 import com.spotify.sdk.android.playback.Player;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
 
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 
-import com.spotify.sdk.android.Spotify;
-import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.authentication.SpotifyAuthentication;
-import com.spotify.sdk.android.playback.Config;
-import com.spotify.sdk.android.playback.ConnectionStateCallback;
-import com.spotify.sdk.android.playback.Player;
 import com.spotify.sdk.android.playback.PlayerNotificationCallback;
 import com.spotify.sdk.android.playback.PlayerState;
 import com.spotify.sdk.android.playback.PlayerStateCallback;
@@ -340,7 +318,7 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
 
 /*
-        playListAdapter=new PlayListAdapetr(ArrayALLPlayList);
+        playListAdapter=new PlaylistHostAdapetr(ArrayALLPlayList);
         ListView allPlayLists = (ListView) findViewById(R.id.allPlayList);
         allPlayLists.setAdapter(playListAdapter);
 */

@@ -1,4 +1,4 @@
-package com.example.paolosalvati.demo;
+package com.example.paolosalvati.demo.dataClasses;
 
 import java.util.List;
 

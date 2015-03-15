@@ -1,4 +1,4 @@
-package com.example.paolosalvati.demo;
+package com.example.paolosalvati.demo.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,17 +7,19 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.example.paolosalvati.demo.R;
+import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyPlaylistObject;
+
 import java.util.List;
 
 /**
  * Created by Paolo on 28/01/2015.
  */
-public class PlayListAdapetr extends BaseAdapter {
+public class PlaylistHostAdapetr extends BaseAdapter {
 
-    List<SpotifyPlayListObject> playlist=null;
+    List<SpotifyPlaylistObject> playlist=null;
 
-    public PlayListAdapetr(List<SpotifyPlayListObject> playlist){
+    public PlaylistHostAdapetr(List<SpotifyPlaylistObject> playlist){
 
         this.playlist=playlist;
 
