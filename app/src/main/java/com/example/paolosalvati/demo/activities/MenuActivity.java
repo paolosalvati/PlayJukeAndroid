@@ -12,11 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.paolosalvati.demo.dataClasses.WifiObject;
-import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
-import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.dataClasses.UserObject;
+import com.example.paolosalvati.demo.dataClasses.WifiObject;
+import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
+import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyUserObject;
+import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.authentication.SpotifyAuthentication;
 import com.spotify.sdk.android.playback.ConnectionStateCallback;
@@ -32,8 +33,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
-import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyUserObject;
 
 
 

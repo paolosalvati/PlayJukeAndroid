@@ -1,8 +1,7 @@
 package com.example.paolosalvati.demo.dataClasses;
 
-import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyTracksObject;
 import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyAllTracksObject;
-
+import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyTracksObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;

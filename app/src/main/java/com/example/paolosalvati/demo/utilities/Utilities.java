@@ -1,9 +1,5 @@
 package com.example.paolosalvati.demo.utilities;
 
-import android.util.Log;
-
-
-
 /**
  * Created by Paolo on 23/02/2015.
  */
@@ -18,17 +14,14 @@ public class Utilities {
      * Timer Format
      * Hours:Minutes:Seconds
      * */
-    public String milliSecondsToTimer(long milliseconds){
-        //Log.d("milliSecondsToTimer 1 ", ((Object) milliseconds).toString());
-
-        /*
+    public static String milliSecondsToTimer(long totalDuration){
         String finalTimerString = "";
         String secondsString = "";
 
         // Convert total duration into time
-        int hours = (int)( milliseconds / (1000*60*60));
-        int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
-        int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
+        int hours = (int)( totalDuration / (1000*60*60));
+        int minutes = (int)(totalDuration % (1000*60*60)) / (1000*60);
+        int seconds = (int) ((totalDuration % (1000*60*60)) % (1000*60) / 1000);
         // Add hours if there
         if(hours > 0){
             finalTimerString = hours + ":";
@@ -40,12 +33,7 @@ public class Utilities {
         }else{
             secondsString = "" + seconds;}
 
-        finalTimerString = finalTimerString + minutes + ":" + secondsString;
-        Log.d("milliSecondsToTimer 2 ",finalTimerString);
-        // return timer string
-        */
-        String finalTimerString = "22";
-        return finalTimerString;
+        return  finalTimerString + minutes + ":" + secondsString;
     }
 
     /**
@@ -53,7 +41,7 @@ public class Utilities {
      * @param currentDuration
      * @param totalDuration
      * */
-    public int getProgressPercentage(long currentDuration, long totalDuration){
+    public static int getProgressPercentage(long currentDuration, long totalDuration){
         Double percentage = (double) 0;
 
         long currentSeconds = (int) (currentDuration / 1000);

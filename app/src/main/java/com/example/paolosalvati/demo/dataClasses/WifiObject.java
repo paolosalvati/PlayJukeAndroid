@@ -1,12 +1,8 @@
 package com.example.paolosalvati.demo.dataClasses;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.res.Resources;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-
-import com.example.paolosalvati.demo.R;
 
 import java.util.List;
 

@@ -17,14 +17,14 @@ import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
-import com.example.paolosalvati.demo.utilities.GlobalObjects;
-import com.example.paolosalvati.demo.handlers.HubHandler;
+import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.adapters.PlayClientAdapter;
 import com.example.paolosalvati.demo.dataClasses.PlayListObject;
-import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
-import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.dataClasses.TrackObject;
+import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
+import com.example.paolosalvati.demo.handlers.HubHandler;
+import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
+import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.microsoft.windowsazure.messaging.NotificationHub;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
@@ -34,15 +34,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 

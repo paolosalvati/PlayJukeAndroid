@@ -1,12 +1,5 @@
 package com.example.paolosalvati.demo.dataClasses;
 
-import java.util.List;
-
-
-import com.google.android.gms.internal.id;
-
-import java.util.List;
-
 /**
  * Created by paolo.salvati on 22/01/2015.
  */

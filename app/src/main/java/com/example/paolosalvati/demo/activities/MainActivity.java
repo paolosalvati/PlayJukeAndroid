@@ -8,8 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.example.paolosalvati.demo.R;
+import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.microsoft.windowsazure.mobileservices.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;

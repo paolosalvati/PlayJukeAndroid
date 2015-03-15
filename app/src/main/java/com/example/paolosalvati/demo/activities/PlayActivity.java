@@ -2,6 +2,7 @@ package com.example.paolosalvati.demo.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,12 +16,14 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.example.paolosalvati.demo.utilities.GlobalObjects;
-import com.example.paolosalvati.demo.handlers.HubHandler;
+import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.adapters.PlayAdapter;
 import com.example.paolosalvati.demo.dataClasses.PlayListObject;
-import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.dataClasses.TrackObject;
+import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
+import com.example.paolosalvati.demo.handlers.HubHandler;
+import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
+import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.example.paolosalvati.demo.utilities.Utilities;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.microsoft.windowsazure.messaging.NotificationHub;
@@ -29,6 +32,9 @@ import com.microsoft.windowsazure.notifications.NotificationsManager;
 import com.spotify.sdk.android.Spotify;
 import com.spotify.sdk.android.playback.Config;
 import com.spotify.sdk.android.playback.Player;
+import com.spotify.sdk.android.playback.PlayerNotificationCallback;
+import com.spotify.sdk.android.playback.PlayerState;
+import com.spotify.sdk.android.playback.PlayerStateCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,16 +44,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-
-
-import android.content.Intent;
-
-import com.spotify.sdk.android.playback.PlayerNotificationCallback;
-import com.spotify.sdk.android.playback.PlayerState;
-import com.spotify.sdk.android.playback.PlayerStateCallback;
+import java.util.List;
 
 
 public class PlayActivity extends ActionBarActivity implements  PlayerNotificationCallback, SeekBar.OnSeekBarChangeListener  {
+
+    private PlayListObject playListObject;
+    private TracksArrayObject tracksArrayObject;
+    List<TrackObject> arrayPlayList;
 
     Context context = this;
 
@@ -83,246 +87,89 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
     int trackPos =0;
 
 
-    ArrayList<TrackObject> ArrayPlayList = new ArrayList<TrackObject>();
+
     //ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
     //ArrayList<HashMap<String, String>> songsListHub = new ArrayList<HashMap<String, String>>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_play);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_play);
 
+            //Save the application Context
+            final Context context = this;
 
-        songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);
-        // Listeners
-        songProgressBar.setOnSeekBarChangeListener(this); // Important
+            //Get Connection to ZUMO client and Spotify Acceess Token
+            final GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
+            final MobileServiceClient zumoClient = globalObjects.getZumoClient();
+            final String spotifyToken = globalObjects.getSpotifyAccessToken();
 
-        songCurrentDurationLabel = (TextView) findViewById(R.id.songCurrentDurationLabel);
-        songTotalDurationLabel = (TextView) findViewById(R.id.songTotalDurationLabel);
-        currenTrack  = (TextView) findViewById(R.id.currentrack);
+            //Connect to GCM GOOGLE NOTIFICATION MESSAGE AND AZURE HUB
+            NotificationsManager.handleNotifications(this, SENDER_ID, HubHandler.class);
+            gcm = GoogleCloudMessaging.getInstance(this);
+            String connectionString = "Endpoint=sb://playhub.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=/dLPV75NdWnCRKADlS1nqU0hl2MySOpqDhgJeVQmdJw=";
+            hub = new NotificationHub("playhub", connectionString, this);
+            registerWithNotificationHubs();
 
+            //Get Track List to be played
+            Bundle datipassati = getIntent().getExtras();
+            final String songs = datipassati.getString("SONGS");
+            Log.d("SONGSrrr",songs);
 
+            //Set SeekBar for track's play progress
+            songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);
+            // Listeners
+            songProgressBar.setOnSeekBarChangeListener(this); // Important
+            songCurrentDurationLabel = (TextView) findViewById(R.id.songCurrentDurationLabel);
+            songTotalDurationLabel = (TextView) findViewById(R.id.songTotalDurationLabel);
+            currenTrack  = (TextView) findViewById(R.id.currentrack);
 
+            try{
+            JsonParserObject jsonParserObject = new JsonParserObject();
+            playListObject = jsonParserObject.jsonClientRegistrationResponseGetPlaylist(songs);
+            tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(songs);
 
+            arrayPlayList= tracksArrayObject.getTracksList();
 
-
-
-
-
-
-        //Connect to GCM GOOGLE NOTIFICATION MESSAGE AND AZURE HUB
-
-
-        NotificationsManager.handleNotifications(this, SENDER_ID, HubHandler.class);
-
-        gcm = GoogleCloudMessaging.getInstance(this);
-
-        String connectionString = "Endpoint=sb://playhub.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=/dLPV75NdWnCRKADlS1nqU0hl2MySOpqDhgJeVQmdJw=";
-        hub = new NotificationHub("playhub", connectionString, this);
-        registerWithNotificationHubs();
-
-
-
-
-        //Save the application Context
-        final Context context = this;
-
-        //Get ACS ZUMO Access Token provided by the collaing MenuActivity
-        Bundle datipassati = getIntent().getExtras();
-
-
-        //final String zumoAcsToken = datipassati.getString("ZUMO_ACS_TOKEN");
-
-        //final String zumoAcsUserId = datipassati.getString("ZUMO_ACS_USER_ID");
-
-        //final String spotifyToken = datipassati.getString("SPOTIFY_TOKEN");
-        final String songs = datipassati.getString("SONGS");
-
-
-        final GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
-        final MobileServiceClient zumoClient = globalObjects.getZumoClient();
-        final String spotifyToken = globalObjects.getSpotifyAccessToken();
-
-
-        Log.d("SONGSxxx",songs);
-
-
-
-
-
-        PlayListObject playlist = new PlayListObject();
-        //PARSO IL JSON
-        JSONObject jsonPlayListObj = null;
-        try {
-            jsonPlayListObj = new JSONObject(songs);
-
-            JSONObject a=jsonPlayListObj.getJSONObject(PlayListObject.TAG_PLAYLIST);
-            playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-            playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-            playlist.setPlaylistuserID(a.optString(PlayListObject.TAG_PLAYLISTUSERID, "defaultValue").toString());
-            playlist.setPlaylistID(a.optString(PlayListObject.TAG_PLAYLISTID, "defaultValue").toString());
-            playlist.setPlaylistName(a.optString(PlayListObject.TAG_PLAYLISTNAME, "defaultValue").toString());
-
-
-            // Getting JSON Array node
-            JSONArray jsonArrayPlaylist = jsonPlayListObj.getJSONArray(PlayListObject.TAG_TRACKS);
-
-            // looping through All jsonArrayPlaylist
-
-
-
-
-
-
-
-            for (int i = 0; i < jsonArrayPlaylist.length(); i++) {
-
-                JSONObject c = jsonArrayPlaylist.getJSONObject(i);
-
-                TrackObject track = new TrackObject();
-                track.setTrackID(c.optString(TrackObject.TAG_TRACKID,"defaultValue").toString());
-                track.setTrackName(c.optString(TrackObject.TAG_TRACKNAME, "defaultValue").toString());
-                track.setDislikes(c.optInt(TrackObject.TAG_DISLIKES, 0));
-                track.setLikes(c.optInt(TrackObject.TAG_LIKES, 0));
-                track.setPosition(c.optInt(TrackObject.TAG_POSITION, 0));
-                track.setAlbum(c.optString(TrackObject.TAG_ALBUM, "defaultValue").toString());
-                track.setArtist(c.optString(TrackObject.TAG_ARTIST, "defaultValue").toString());
-
-                ArrayPlayList.add(track);
-
-                HashMap<String, String> song = new HashMap<String, String>();
-                song.put("songTitle",track.getTrackName());
-                song.put("songPath",  track.getTrackID());
-
-                // Adding each song to SongList
-               // songsList.add(song);
-            }
-
-
-
+            //Show Playlist Info
             TextView playlistTitle = (TextView) findViewById(R.id.title);
-            playlistTitle.setText(playlist.getPlaylistName());
+            playlistTitle.setText(playListObject.getPlaylistName());
 
-
-            Collections.sort(ArrayPlayList, new Comparator<TrackObject>() {
-                public int compare(TrackObject obj1, TrackObject obj2) {
-                    // TODO Auto-generated method stub
-                    int obj1_poistion = obj1.getPosition();
-                    int obj2_poistion = obj2.getPosition();
-                    ;
-
-                    return (obj1_poistion < obj2_poistion) ? -1 : (obj1_poistion > obj2_poistion) ? 1 : 0;
-                }
-            });
-
-
-            playListAdapter = new PlayAdapter(ArrayPlayList);
+           //Show Track List
+            playListAdapter = new PlayAdapter(arrayPlayList);
             playlistView = (ListView) findViewById(R.id.tracks);
             playlistView.setAdapter(playListAdapter);
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-
-        Config playerConfig = new Config(this, spotifyToken, "d8e85984e9ac47399e41f0954563cce2");
-
-        Spotify spotify = new Spotify();
-
-        mPlayer = spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
-            @Override
-            public void onInitialized() {
-
-                //mPlayer.addConnectionStateCallback(PlayActivity.this);
-                mPlayer.addPlayerNotificationCallback(PlayActivity.this);
-
-/*
-                mPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
-                                @Override
-                               public void onPlaybackEvent(EventType eventType, PlayerState state) {
-                                         if (SpotifyHandler.this.isHost) {
-                                                 if (eventType == EventType.PAUSE) {
-                                                         String playlist = SpotifyHandler.this.activity.playlistName;
-                                                         String songUri = state.trackUri;
-                                                         String song = SpotifyHandler.this.playingTracks.getTitleFromUri(songUri);
-                                                         song = song + " - "+ SpotifyHandler.this.playingTracks.getArtistFromTitle(song);
-                                                         int time = state.positionInMs;
-                                                         SpotifyHandler.this.activity.firebaseHandler.pushToFirebase(playlist, songUri, song, time, !SpotifyHandler.this.paused);
-                                                     }
-                                                 if (eventType == EventType.AUDIO_FLUSH) {
-                                                         String playlist = SpotifyHandler.this.activity.playlistName;
-                                                         String songUri = state.trackUri;
-                                                         String song = SpotifyHandler.this.playingTracks.getTitleFromUri(songUri);
-                                                         song = song + " - "+ SpotifyHandler.this.playingTracks.getArtistFromTitle(song);
-                                                         int time = state.positionInMs;
-                                                         ((TextView)SpotifyHandler.this.activity.findViewById(R.id.currently_playing)).setText(song);
-                                                         SpotifyHandler.this.activity.firebaseHandler.pushToFirebase(playlist, songUri, song, time, !SpotifyHandler.this.paused);
-                                                     } else if (eventType == EventType.PLAY) {
-                                                         String playlist = SpotifyHandler.this.activity.playlistName;
-                                                         String songUri = state.trackUri;
-                                                         String song = SpotifyHandler.this.playingTracks.getTitleFromUri(songUri);
-                                                         song = song + " - "+ SpotifyHandler.this.playingTracks.getArtistFromTitle(song);
-                                                         int time = state.positionInMs;
-                                                         ((TextView)SpotifyHandler.this.activity.findViewById(R.id.currently_playing)).setText(song);
-                                                         SpotifyHandler.this.activity.firebaseHandler.pushToFirebase(playlist, songUri, song, time, !SpotifyHandler.this.paused);
-                                                     }
-
-
-                                                 // We're only allowing the user to go forward, so call this as if it means onNextSong:
-                                                 if (eventType == EventType.END_OF_CONTEXT) {
-                                                         MainActivity activity = SpotifyHandler.this.activity;
-
-
-                                                         SpotifyHandler.this.songIndex += 1;
-                                                         SpotifyHandler.this.mPlayer.play(SpotifyHandler.this.playingTracks.tracks.get(SpotifyHandler.this.songIndex).getUri());
-                                                         activity.displayCurrentQueue(SpotifyHandler.this.songIndex);
-                                                     }
-                                             } else if (SpotifyHandler.this.isSlave) {
-                                                 if (eventType == EventType.AUDIO_FLUSH) {
-                                                         long current_time = new Date().getTime();
-                                                         int diff = (int) (current_time-SpotifyHandler.this.timestamp);
-                                                         int newPos = diff+SpotifyHandler.this.origSongPos;
-                                                         if ((Math.abs(newPos-state.positionInMs))>150) {
-                                                                 mPlayer.seekToPosition(newPos);
-                                                                 SpotifyHandler.this.activity.setNotMuted();
-                                                             }
-                                                     }
-                                             }
-                                     }
-                             });
-
-*/
-
-                Log.d("uuuu",   ArrayPlayList.get(trackPos).getTrackName());
-                mPlayer.play("spotify:track:" + ArrayPlayList.get(trackPos).getTrackID());
-
-                // set Progress bar values
-                songProgressBar.setProgress(0);
-                songProgressBar.setMax(100);
-                currenTrack.setText(ArrayPlayList.get(trackPos).getTrackName());
-
-
-
-
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
 
-            @Override
-            public void onError(Throwable throwable) {
+            //Costruisco il Player
+            Config playerConfig = new Config(this, spotifyToken, "d8e85984e9ac47399e41f0954563cce2");
+            Spotify spotify = new Spotify();
+            mPlayer = spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
+                @Override
+                public void onInitialized() {
 
-            }
+                    mPlayer.addPlayerNotificationCallback(PlayActivity.this);
+                    Log.d("Play: ",   arrayPlayList.get(trackPos).getTrackName());
+                    mPlayer.play("spotify:track:" + arrayPlayList.get(trackPos).getTrackID());
+
+                    // set Progress bar values
+                    songProgressBar.setProgress(0);
+                    songProgressBar.setMax(100);
+                    currenTrack.setText(arrayPlayList.get(trackPos).getTrackName());
+
+                }
 
 
+                @Override
+                public void onError(Throwable throwable) {
 
-/*
-        playListAdapter=new PlaylistHostAdapetr(ArrayALLPlayList);
-        ListView allPlayLists = (ListView) findViewById(R.id.allPlayList);
-        allPlayLists.setAdapter(playListAdapter);
-*/
-        });
+                }
+
+            });
 
 
 
@@ -354,62 +201,30 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
     @Override
     public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
-
-
-
-
         // Updating progress bar
         updateProgressBar();
 
         Log.d("PlayActivity", "Playback event received: " + eventType.name());
         switch (eventType) {
-           case TRACK_START: Log.i("onPlaybackEventTRACK_START", ArrayPlayList.get(trackPos).getTrackName());
-
-
-                break;
+            case TRACK_START: Log.i("onPlaybackEventTRACK_START", arrayPlayList.get(trackPos).getTrackName());
+            break;
             case PLAY:
-
                 long totalDuration = playerState.durationInMs;
                 long currentDuration = playerState.positionInMs;
-                Log.d("olga","1"+ ((Object) totalDuration).toString());
-                Log.d("olga","2"+ ((Object) currentDuration).toString());
-                String finalTimerString = "";
-                String secondsString = "";
-
-                // Convert total duration into time
-                int hours = (int)( totalDuration / (1000*60*60));
-                int minutes = (int)(totalDuration % (1000*60*60)) / (1000*60);
-                int seconds = (int) ((totalDuration % (1000*60*60)) % (1000*60) / 1000);
-                // Add hours if there
-                if(hours > 0){
-                    finalTimerString = hours + ":";
-                }
-
-                // Prepending 0 to seconds if it is one digit
-                if(seconds < 10){
-                    secondsString = "0" + seconds;
-                }else{
-                    secondsString = "" + seconds;}
-
-                finalTimerString = finalTimerString + minutes + ":" + secondsString;
-                Log.d("olga","3"+ finalTimerString);
-                //Log.d("olga","3"+ ((Object) utils.milliSecondsToTimer(totalDuration)).toString());
-                //Log.d("olga","3"+ ((Object) utils.milliSecondsToTimer(currentDuration)).toString());
 
                 // Displaying Total Duration time
+                String finalTimerString=Utilities.milliSecondsToTimer(totalDuration);
                 songTotalDurationLabel.setText(finalTimerString);
-                // Displaying time completed playing
-               // songCurrentDurationLabel.setText(""+utils.milliSecondsToTimer(currentDuration));
-                break;
-            case TRACK_END: Log.i("onPlaybackEventTRACK_END", ArrayPlayList.get(trackPos).getTrackName());
+            break;
+            case TRACK_END: Log.i("onPlaybackEventTRACK_END", arrayPlayList.get(trackPos).getTrackName());
                 trackPos =trackPos+1;
-                mPlayer.play("spotify:track:" + ArrayPlayList.get(trackPos).getTrackID());
-                currenTrack.setText( ArrayPlayList.get(trackPos).getTrackName());
+                mPlayer.play("spotify:track:" + arrayPlayList.get(trackPos).getTrackID());
+                currenTrack.setText( arrayPlayList.get(trackPos).getTrackName());
                 break;
 
             default:
                 Log.i("onPlaybackEventTRACK_default",eventType.toString());
-                break;
+            break;
         }
     }
 
@@ -460,89 +275,33 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
         public void onReceive(Context context, Intent intent) {
 
             // Extract data included in the Intent
-            String message = intent.getStringExtra("message");
-
-            //Recupero il Bottone di Logout tramite l'ID
-            //TextView txtMessage =(TextView) findViewById(R.id.message);
-            //txtMessage.setText(message);
-
-
-            if (message != null) {
+            String songs = intent.getStringExtra("message");
+            if (songs != null) {
                 try {
 
-                    /*
-                    PlayListObject playlist = new PlayListObject();
-                    //PARSO IL JSON
-                    JSONObject jsonPlayListObj = new JSONObject(message);
-                    playlist.setProvider(jsonPlayListObj.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-                    playlist.setProvider(jsonPlayListObj.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-                    playlist.setPlaylistuserID(jsonPlayListObj.optString(PlayListObject.TAG_PLAYLISTUSERID, "defaultValue").toString());
-                    playlist.setPlaylistID(jsonPlayListObj.optString(PlayListObject.TAG_PLAYLISTID, "defaultValue").toString());
-                    playlist.setPlaylistName(jsonPlayListObj.optString(PlayListObject.TAG_PLAYLISTNAME, "defaultValue").toString());
+                    JsonParserObject jsonParserObject = new JsonParserObject();
+                    playListObject = jsonParserObject.jsonClientRegistrationResponseGetPlaylist(songs);
+                    tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(songs);
 
-*/
+                    arrayPlayList= tracksArrayObject.getTracksList();
 
-                    PlayListObject playlist = new PlayListObject();
+                    /*DA SPOSTARE NEL PLAYER....imizio
+                    *
+                    */
 
-                    JSONObject jsonPlayListObj = new JSONObject(message);
-
-                    JSONObject a=jsonPlayListObj.getJSONObject(PlayListObject.TAG_PLAYLIST);
-                    playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-                    playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-                    playlist.setPlaylistuserID(a.optString(PlayListObject.TAG_PLAYLISTUSERID, "defaultValue").toString());
-                    playlist.setPlaylistID(a.optString(PlayListObject.TAG_PLAYLISTID, "defaultValue").toString());
-                    playlist.setPlaylistName(a.optString(PlayListObject.TAG_PLAYLISTNAME, "defaultValue").toString());
-
-                    // Getting JSON Array node
-                    JSONArray jsonArrayPlaylist = jsonPlayListObj.getJSONArray(PlayListObject.TAG_TRACKS);
-                    ArrayList<TrackObject> ArrayPlayList = new ArrayList<TrackObject>();
-                    // looping through All jsonArrayPlaylist
-
-                    for (int i = 0; i < jsonArrayPlaylist.length(); i++) {
-
-                        JSONObject c = jsonArrayPlaylist.getJSONObject(i);
-
-                        TrackObject track = new TrackObject();
-                        track.setTrackID(c.optString(TrackObject.TAG_TRACKID,"defaultValue").toString());
-                        track.setTrackName(c.optString(TrackObject.TAG_TRACKNAME, "defaultValue").toString());
-                        track.setDislikes(c.optInt(TrackObject.TAG_DISLIKES, 0));
-                        track.setLikes(c.optInt(TrackObject.TAG_LIKES, 0));
-                        track.setPosition(c.optInt(TrackObject.TAG_POSITION, 0));
-                        track.setAlbum(c.optString(TrackObject.TAG_ALBUM, "defaultValue").toString());
-                        track.setArtist(c.optString(TrackObject.TAG_ARTIST, "defaultValue").toString());
-                        ArrayPlayList.add(track);
-
-                        HashMap<String, String> song = new HashMap<String, String>();
-                        song.put("songTitle",track.getTrackName());
-                        song.put("songPath",  track.getTrackID());
-
-                        // Adding each song to SongList
-                        //songsListHub.add(song);
-
-                    }
-
-                    //songsList = songsListHub;
-
+                    //Show Playlist Info
                     TextView playlistTitle = (TextView) findViewById(R.id.title);
-                    playlistTitle.setText(playlist.getPlaylistName());
+                    playlistTitle.setText(playListObject.getPlaylistName());
 
-
-                    Collections.sort(ArrayPlayList, new Comparator<TrackObject>() {
-                        public int compare(TrackObject obj1, TrackObject obj2) {
-                            // TODO Auto-generated method stub
-                            int obj1_poistion = obj1.getPosition();
-                            int obj2_poistion = obj2.getPosition();
-                            ;
-
-                            return (obj1_poistion < obj2_poistion) ? -1 : (obj1_poistion > obj2_poistion) ? 1 : 0;
-                        }
-                    });
-
-                    playListAdapter = new PlayAdapter(ArrayPlayList);
+                    //Show Track List
+                    playListAdapter = new PlayAdapter(arrayPlayList);
                     playlistView = (ListView) findViewById(R.id.tracks);
                     playlistView.setAdapter(playListAdapter);
 
 
+                    /*DA SPOSTARE NEL PLAYER....fine
+                    *
+                    */
                 } catch (JSONException e) {
                     e.printStackTrace();
 
@@ -577,45 +336,11 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
                                            long currentDuration = playerState.positionInMs;
                                            long totalDuration = playerState.durationInMs;
-
-                                           String finalTimerString = "";
-                                           String secondsString = "";
-
-                                           // Convert total duration into time
-                                           int hours = (int)( currentDuration / (1000*60*60));
-                                           int minutes = (int)(currentDuration % (1000*60*60)) / (1000*60);
-                                           int seconds = (int) ((currentDuration % (1000*60*60)) % (1000*60) / 1000);
-                                           // Add hours if there
-                                           if(hours > 0){
-                                               finalTimerString = hours + ":";
-                                           }
-
-                                           // Prepending 0 to seconds if it is one digit
-                                           if(seconds < 10){
-                                               secondsString = "0" + seconds;
-                                           }else{
-                                               secondsString = "" + seconds;}
-
-                                           finalTimerString = finalTimerString + minutes + ":" + secondsString;
-                                           //Log.d("olga","3"+ finalTimerString);
-                                           //Log.d("olga","3"+ ((Object) utils.milliSecondsToTimer(totalDuration)).toString());
-                                           //Log.d("olga","3"+ ((Object) utils.milliSecondsToTimer(currentDuration)).toString());
-
                                            // Displaying Total Duration time
+                                           String finalTimerString=Utilities.milliSecondsToTimer(currentDuration);
                                            songCurrentDurationLabel.setText(finalTimerString);
 
-
-
-                                           //Log.d("olga","4"+ ((Object) currentDuration).toString());
-                                           // Displaying Total Duration time
-                                           //songTotalDurationLabel.setText(""+utils.milliSecondsToTimer(totalDuration));
-
-                                           // Displaying time completed playing
-                                           //songCurrentDurationLabel.setText(""+utils.milliSecondsToTimer(currentDuration));
-
-                                           // Updating progress bar
-                                           //int progress = (int)(utils.getProgressPercentage(currentDuration, totalDuration));
-
+                                           /*
                                            Double percentage = (double) 0;
 
                                            long currentSeconds = (int) (currentDuration / 1000);
@@ -626,7 +351,8 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
                                            // return percentage
                                            int progress= percentage.intValue();
-
+                                           */
+                                            int progress=Utilities.getProgressPercentage(currentDuration,totalDuration);
                                            //Log.d("Progress", ""+progress);
                                            songProgressBar.setProgress(progress);
 

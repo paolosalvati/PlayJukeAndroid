@@ -3,7 +3,6 @@ package com.example.paolosalvati.demo.jsonWcf;
 import android.net.wifi.ScanResult;
 import android.util.Log;
 
-import com.example.paolosalvati.demo.adapters.PlayClientAdapter;
 import com.example.paolosalvati.demo.dataClasses.PlayListObject;
 import com.example.paolosalvati.demo.dataClasses.TrackObject;
 import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
@@ -13,10 +12,6 @@ import com.example.paolosalvati.demo.dataClasses.WifiObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Created by Paolo on 15/03/2015.

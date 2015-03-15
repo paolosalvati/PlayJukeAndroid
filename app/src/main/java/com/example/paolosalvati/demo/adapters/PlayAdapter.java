@@ -1,18 +1,16 @@
 package com.example.paolosalvati.demo.adapters;
 
-import android.widget.BaseAdapter;
-
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-        import java.util.List;
 
 import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.dataClasses.TrackObject;
+
+import java.util.List;
 
 /**
  * Created by Paolo on 13/02/2015.
