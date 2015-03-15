@@ -1,10 +1,9 @@
-package com.example.paolosalvati.demo.jsonToWcf;
+package com.example.paolosalvati.demo.jsonWcf;
 
-import android.content.Context;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import com.example.paolosalvati.demo.adapters.PlayClientAdapter;
 import com.example.paolosalvati.demo.dataClasses.PlayListObject;
 import com.example.paolosalvati.demo.dataClasses.TrackObject;
 import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
@@ -15,7 +14,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by Paolo on 15/03/2015.
@@ -191,9 +192,39 @@ public class JsonParserObject {
 
 
 
+    public PlayListObject jsonClientRegistrationResponseGetPlaylist(String jsonStringTracksList) throws JSONException {
+
+        //Istanzio la Playlist
+        PlayListObject playListObject = new PlayListObject();
 
 
+        //PARSO IL JSON
+        JSONObject jsonPlayListObj = null;
+        jsonPlayListObj = new JSONObject(jsonStringTracksList);
 
+        JSONObject a=jsonPlayListObj.getJSONObject(PlayListObject.TAG_PLAYLIST);
+
+        playListObject.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
+        playListObject.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
+        playListObject.setPlaylistuserID(a.optString(PlayListObject.TAG_PLAYLISTUSERID, "defaultValue").toString());
+        playListObject.setPlaylistID(a.optString(PlayListObject.TAG_PLAYLISTID, "defaultValue").toString());
+        playListObject.setPlaylistName(a.optString(PlayListObject.TAG_PLAYLISTNAME, "defaultValue").toString());
+
+        return playListObject;
+    }
+
+    public TracksArrayObject jsonClientRegistrationResponseGetTracks(String jsonStringTracksList) throws JSONException {
+
+        //PARSO IL JSON
+        JSONObject jsonObject = null;
+        jsonObject = new JSONObject(jsonStringTracksList);
+        // Getting JSON Array node
+        JSONArray jsonArray = jsonObject.getJSONArray(PlayListObject.TAG_TRACKS);
+
+        TracksArrayObject tracksArrayObject = new TracksArrayObject(jsonArray);
+
+        return tracksArrayObject;
+    }
 
 
 

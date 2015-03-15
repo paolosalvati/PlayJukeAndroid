@@ -17,10 +17,12 @@ import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.example.paolosalvati.demo.handlers.HubHandler;
 import com.example.paolosalvati.demo.adapters.PlayClientAdapter;
 import com.example.paolosalvati.demo.dataClasses.PlayListObject;
+import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
 import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.dataClasses.TrackObject;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -41,10 +43,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 
 public class ClientActivity extends ListActivity {
 
+    private PlayListObject playListObject;
+    private TracksArrayObject tracksArrayObject;
 
     private final static String SERVICE_URI = "http://jukeserver.cloudapp.net/JukeSvc.svc/";
     Context context = this;
@@ -58,10 +63,10 @@ public class ClientActivity extends ListActivity {
     private ListAdapter playListAdapter = null;
 
 
- // contacts JSONArray
-    JSONArray jsonArrayALLPlaylists = null;
-    JSONArray jsonArrayALLTracks = null;
-    JSONArray jsonArrayINFOPlaylist = null;
+    // contacts JSONArray
+    //JSONArray jsonArrayALLPlaylists = null;
+    //JSONArray jsonArrayALLTracks = null;
+    //JSONArray jsonArrayINFOPlaylist = null;
     //int trackPos =0;
 
 
@@ -73,115 +78,38 @@ public class ClientActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_client);
 
-        //Connect to GCM GOOGLE NOTIFICATION MESSAGE AND AZURE HUB
-        NotificationsManager.handleNotifications(this, SENDER_ID, HubHandler.class);
-        gcm = GoogleCloudMessaging.getInstance(this);
-        String connectionString = "Endpoint=sb://playhub.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=/dLPV75NdWnCRKADlS1nqU0hl2MySOpqDhgJeVQmdJw=";
-        hub = new NotificationHub("playhub", connectionString, this);
-        registerWithNotificationHubs();
         //Save the application Context
         final Context context = this;
+
+        //Get Connection to ZUMO client
+        final GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
+        final MobileServiceClient zumoClient = globalObjects.getZumoClient();
 
         //Get ACS ZUMO Access Token provided by the collaing MenuActivity
         Bundle datipassati = getIntent().getExtras();
         final String songs = datipassati.getString("SONGS");
         Log.d("SONGSxxx",songs);
 
+        //Connect to GCM GOOGLE NOTIFICATION MESSAGE AND AZURE HUB
+        NotificationsManager.handleNotifications(this, SENDER_ID, HubHandler.class);
+        gcm = GoogleCloudMessaging.getInstance(this);
+        String connectionString = "Endpoint=sb://playhub.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=/dLPV75NdWnCRKADlS1nqU0hl2MySOpqDhgJeVQmdJw=";
+        hub = new NotificationHub("playhub", connectionString, this);
+        registerWithNotificationHubs();
 
-        final GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
-        final MobileServiceClient zumoClient = globalObjects.getZumoClient();
 
-
-        PlayListObject playlist = new PlayListObject();
-        //PARSO IL JSON
-        JSONObject jsonPlayListObj = null;
         try {
-            jsonPlayListObj = new JSONObject(songs);
 
-            JSONObject a=jsonPlayListObj.getJSONObject(PlayListObject.TAG_PLAYLIST);
-
-            playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-            playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-            playlist.setPlaylistuserID(a.optString(PlayListObject.TAG_PLAYLISTUSERID, "defaultValue").toString());
-            playlist.setPlaylistID(a.optString(PlayListObject.TAG_PLAYLISTID, "defaultValue").toString());
-            playlist.setPlaylistName(a.optString(PlayListObject.TAG_PLAYLISTNAME, "defaultValue").toString());
+            JsonParserObject jsonParserObject = new JsonParserObject();
+            playListObject = jsonParserObject.jsonClientRegistrationResponseGetPlaylist(songs);
+            tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(songs);
+            List<TrackObject> arrayPlayList;
+            arrayPlayList= tracksArrayObject.getTracksList();
 
 
-            // Getting JSON Array node
-            JSONArray jsonArrayPlaylist = jsonPlayListObj.getJSONArray(PlayListObject.TAG_TRACKS);
-            ArrayList<TrackObject> ArrayPlayList = new ArrayList<TrackObject>();
-            // looping through All jsonArrayPlaylist
-
-
-            for (int i = 0; i < jsonArrayPlaylist.length(); i++) {
-
-                JSONObject c = jsonArrayPlaylist.getJSONObject(i);
-
-                TrackObject track = new TrackObject();
-                track.setId(c.optInt(TrackObject.TAG_ID,0));
-                track.setTrackID(c.optString(TrackObject.TAG_TRACKID,"defaultValue").toString());
-                track.setTrackName(c.optString(TrackObject.TAG_TRACKNAME, "defaultValue").toString());
-                track.setDislikes(c.optInt(TrackObject.TAG_DISLIKES, 0));
-                track.setLikes(c.optInt(TrackObject.TAG_LIKES, 0));
-                track.setPosition(c.optInt(TrackObject.TAG_POSITION, 0));
-                track.setAlbum(c.optString(TrackObject.TAG_ALBUM, "defaultValue").toString());
-                track.setArtist(c.optString(TrackObject.TAG_ARTIST, "defaultValue").toString());
-
-                ArrayPlayList.add(track);
-
-            }
-
-
-
-            Collections.sort(ArrayPlayList, new Comparator<TrackObject>(){
-                public int compare(TrackObject obj1, TrackObject obj2)
-                {
-                    // TODO Auto-generated method stub
-                    int obj1_poistion=obj1.getPosition();
-                    int obj2_poistion=obj2.getPosition();;
-
-                    return (obj1_poistion < obj2_poistion) ? -1: (obj1_poistion >obj2_poistion) ? 1:0 ;
-                }
-            });
-
-
-            playListAdapter = new PlayClientAdapter(ArrayPlayList);
-            //playlistView = (ListView) findViewById(R.id.clientracks);
-            //playlistView.setAdapter(playListAdapter);
+            //Show Track List
+            playListAdapter = new PlayClientAdapter(arrayPlayList);
             getListView().setAdapter(playListAdapter);
-/*
-            //SETTO l'setOnItemClickListener per invocare il WCF passando la playlist selezionata
-            playlistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adattatore, final View componente, int pos, long id) {
-
-
-                    final TrackObject track = (TrackObject) adattatore.getItemAtPosition(pos);
-
-                    ImageButton btn_like =(ImageButton) componente.findViewById(R.id.track_btn_like);
-                    btn_like.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            int position = getListView().getPositionForView((RelativeLayout)v.getParent());
-                            TrackObject ta = (TrackObject)playListAdapter.getItem(position);
-                            Log.d("Ti piace: ",ta.getTrackName());
-                        }
-                    });
-                }
-            });
-
-*/
-
-
-
-
-
-
-
-
-
-
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -264,64 +192,24 @@ public class ClientActivity extends ListActivity {
             if (message != null) {
                 try {
 
-                    PlayListObject playlist = new PlayListObject();
-                    JSONObject jsonPlayListObj = new JSONObject(message);
-                    JSONObject a=jsonPlayListObj.getJSONObject(PlayListObject.TAG_PLAYLIST);
-                    playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-                    playlist.setProvider(a.optString(PlayListObject.TAG_PROVIDER, "defaultValue").toString());
-                    playlist.setPlaylistuserID(a.optString(PlayListObject.TAG_PLAYLISTUSERID, "defaultValue").toString());
-                    playlist.setPlaylistID(a.optString(PlayListObject.TAG_PLAYLISTID, "defaultValue").toString());
-                    playlist.setPlaylistName(a.optString(PlayListObject.TAG_PLAYLISTNAME, "defaultValue").toString());
-
-                    // Getting JSON Array node
-                    JSONArray jsonArrayPlaylist = jsonPlayListObj.getJSONArray(PlayListObject.TAG_TRACKS);
-                    ArrayList<TrackObject> ArrayPlayList = new ArrayList<TrackObject>();
-                    // looping through All jsonArrayPlaylist
-
-                    for (int i = 0; i < jsonArrayPlaylist.length(); i++) {
-
-                        JSONObject c = jsonArrayPlaylist.getJSONObject(i);
-
-                        TrackObject track = new TrackObject();
-                        track.setId(c.optInt(TrackObject.TAG_ID,0));
-                        track.setTrackID(c.optString(TrackObject.TAG_TRACKID,"defaultValue").toString());
-                        track.setTrackName(c.optString(TrackObject.TAG_TRACKNAME, "defaultValue").toString());
-                        track.setDislikes(c.optInt(TrackObject.TAG_DISLIKES, 0));
-                        track.setLikes(c.optInt(TrackObject.TAG_LIKES, 0));
-                        track.setRank(c.optString(TrackObject.TAG_RANK, "defaultValue"));
-                        track.setPosition(c.optInt(TrackObject.TAG_POSITION, 0));
-                        track.setAlbum(c.optString(TrackObject.TAG_ALBUM, "defaultValue").toString());
-                        track.setArtist(c.optString(TrackObject.TAG_ARTIST, "defaultValue").toString());
-                        ArrayPlayList.add(track);
 
 
-                    }
+                        JsonParserObject jsonParserObject = new JsonParserObject();
+                        playListObject = jsonParserObject.jsonClientRegistrationResponseGetPlaylist(message);
+                        tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(message);
+                        List<TrackObject> arrayPlayList;
+                        arrayPlayList= tracksArrayObject.getTracksList();
 
 
-                    Collections.sort(ArrayPlayList, new Comparator<TrackObject>(){
-                        public int compare(TrackObject obj1, TrackObject obj2)
-                        {
-                            // TODO Auto-generated method stub
-                            int obj1_poistion=obj1.getPosition();
-                            int obj2_poistion=obj2.getPosition();;
+                        //Show Track List
+                        playListAdapter = new PlayClientAdapter(arrayPlayList);
+                        //playlistView = (ListView) findViewById(R.id.clientracks);
+                        //playlistView.setAdapter(playListAdapter);
+                        getListView().setAdapter(playListAdapter);
 
-                            return (obj1_poistion < obj2_poistion) ? -1: (obj1_poistion >obj2_poistion) ? 1:0 ;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    });
-
-
-
-                    playListAdapter = new PlayClientAdapter(ArrayPlayList);
-                    //playlistView = (ListView) findViewById(R.id.clientracks);
-                    //playlistView.setAdapter(playListAdapter);
-                    getListView().setAdapter(playListAdapter);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-
-                }
-
-
             }
         }
 
@@ -346,10 +234,10 @@ public class ClientActivity extends ListActivity {
         TextView child = (TextView)vwParentRow.getChildAt(0);
         ImageButton btn = (ImageButton)vwParentRow.getChildAt(9);
         btn.setClickable(false);
-       // Button btnChild = (Button)vwParentRow.getChildAt(1);
-       // btnChild.setText(child.getText());
-       // btnChild.setText("I've been clicked!");
-       Log.d("muffaaaa",child.getText().toString());
+        // Button btnChild = (Button)vwParentRow.getChildAt(1);
+        // btnChild.setText(child.getText());
+        // btnChild.setText("I've been clicked!");
+        Log.d("muffaaaa",child.getText().toString());
 
 
 
@@ -383,7 +271,7 @@ public class ClientActivity extends ListActivity {
         final String s = json.toString();
         StringEntity entity = null;
         try {
-           // s_json = s.toString();
+            // s_json = s.toString();
             Log.d("muffa: json", s);
             entity = new StringEntity(s, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -411,7 +299,7 @@ public class ClientActivity extends ListActivity {
 
         // int c = Color.CYAN;
 
-       // vwParentRow.setBackgroundColor(c);
+        // vwParentRow.setBackgroundColor(c);
         //vwParentRow.refreshDrawableState();
     }
 

@@ -3,7 +3,6 @@ package com.example.paolosalvati.demo.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -16,7 +15,7 @@ import android.widget.ListView;
 
 import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
 import com.example.paolosalvati.demo.dataClasses.WifiObject;
-import com.example.paolosalvati.demo.jsonToWcf.JsonParserObject;
+import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
 import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyAllPlaylistsObject;
 import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyAllTracksObject;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
@@ -38,7 +37,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,7 +44,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 
 public class HostActivity extends Activity {

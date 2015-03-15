@@ -4,11 +4,8 @@
 package com.example.paolosalvati.demo.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -16,9 +13,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.paolosalvati.demo.dataClasses.WifiObject;
-import com.example.paolosalvati.demo.jsonToWcf.JsonParserObject;
+import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
-import com.example.paolosalvati.demo.dataClasses.PlayListObject;
 import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.dataClasses.UserObject;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -32,13 +28,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyUserObject;
 
