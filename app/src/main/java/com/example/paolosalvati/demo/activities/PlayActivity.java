@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +23,7 @@ import com.example.paolosalvati.demo.adapters.PlayAdapter;
 import com.example.paolosalvati.demo.dataClasses.PlayListObject;
 import com.example.paolosalvati.demo.dataClasses.TrackObject;
 import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
+import com.example.paolosalvati.demo.dataClasses.UserObject;
 import com.example.paolosalvati.demo.handlers.HubHandler;
 import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
@@ -36,10 +39,16 @@ import com.spotify.sdk.android.playback.PlayerNotificationCallback;
 import com.spotify.sdk.android.playback.PlayerState;
 import com.spotify.sdk.android.playback.PlayerStateCallback;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,7 +57,7 @@ import java.util.List;
 
 
 public class PlayActivity extends ActionBarActivity implements  PlayerNotificationCallback, SeekBar.OnSeekBarChangeListener  {
-
+    private UserObject userObject;
     private PlayListObject playListObject;
     private TracksArrayObject tracksArrayObject;
     List<TrackObject> arrayPlayList;
@@ -86,7 +95,8 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
     JSONArray jsonArrayINFOPlaylist = null;
     int trackPos =0;
 
-
+    //WCF
+    private String SERVICE_URI;
 
     //ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
     //ArrayList<HashMap<String, String>> songsListHub = new ArrayList<HashMap<String, String>>();
@@ -115,9 +125,13 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
             final String songs = datipassati.getString("SONGS");
             Log.d("SONGSrrr",songs);
 
+        Log.d("SONGSrrr","1");
+            SERVICE_URI = getApplication().getString(R.string.azure_wcf_service_uri);
+
             //Set SeekBar for track's play progress
             songProgressBar = (SeekBar) findViewById(R.id.songProgressBar);
             // Listeners
+
             songProgressBar.setOnSeekBarChangeListener(this); // Important
             songCurrentDurationLabel = (TextView) findViewById(R.id.songCurrentDurationLabel);
             songTotalDurationLabel = (TextView) findViewById(R.id.songTotalDurationLabel);
@@ -125,8 +139,13 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
             try{
             JsonParserObject jsonParserObject = new JsonParserObject();
+                Log.d("SONGSrrr","2");
+            userObject=    jsonParserObject.jsonClientRegistrationResponseGetUser(songs);
+                Log.d("SONGSrrr","3");
             playListObject = jsonParserObject.jsonClientRegistrationResponseGetPlaylist(songs);
+                Log.d("SONGSrrr","4");
             tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(songs);
+                Log.d("SONGSrrr","5");
 
             arrayPlayList= tracksArrayObject.getTracksList();
 
@@ -207,6 +226,70 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
         Log.d("PlayActivity", "Playback event received: " + eventType.name());
         switch (eventType) {
             case TRACK_START: Log.i("onPlaybackEventTRACK_START", arrayPlayList.get(trackPos).getTrackName());
+
+
+
+                // Creating root JSONObject
+                JSONObject json = new JSONObject();
+
+
+                try {
+                   if(trackPos==0) {
+                       json.put("mac", userObject.getMac());
+                       json.put("trackid", 0);
+                       json.put("playlistid",  0 );
+                   }
+                    else{
+                       json.put("mac", userObject.getMac());
+                       json.put("trackid", arrayPlayList.get(trackPos).getId());
+                       json.put("plistid",  1122 );
+                   }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                };
+
+
+                String stringJson = json.toString();
+                // Get formatted and indented JSON String
+                //String s2 = json.toString(4);
+
+
+
+
+                if (android.os.Build.VERSION.SDK_INT > 9) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+                }
+                ;
+
+
+                // POST request to WCF
+                HttpPost request = new HttpPost(SERVICE_URI + "DeactivateTrack");
+                request.setHeader("Accept", "application/json");
+                request.setHeader("Content-type", "application/json");
+                StringEntity entity = null;
+                try {
+                    Log.d("WebInvoke DeactivateTrack: json", stringJson);
+                    entity = new StringEntity(stringJson, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                request.setEntity(entity);
+
+                // Send request to WCF service
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpResponse httpResponse = null;
+
+                try {
+                    httpResponse = httpClient.execute(request);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("WebInvoke DeactivateTrack", "KO : " + e.toString());
+                };
+
+
+
             break;
             case PLAY:
                 long totalDuration = playerState.durationInMs;

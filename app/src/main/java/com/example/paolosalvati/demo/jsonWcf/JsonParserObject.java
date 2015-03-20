@@ -222,6 +222,32 @@ public class JsonParserObject {
     }
 
 
+    public UserObject jsonClientRegistrationResponseGetUser(String jsonString) throws JSONException {
+
+
+        //Istanzio la Playlist
+        UserObject userObject = new UserObject();
+
+
+        //PARSO IL JSON
+        JSONObject jsonUserObj = null;
+        jsonUserObj = new JSONObject(jsonString);
+        Log.d("SONGSrrr","a");
+        JSONObject a=jsonUserObj.getJSONObject(UserObject.TAG_HOST);
+        Log.d("SONGSrrr","b");
+        userObject.setOs(a.optString(UserObject.TAG_OS, "defaultValue").toString());
+        Log.d("SONGSrrr","c");
+        userObject.setMac(a.optString(UserObject.TAG_MAC, "defaultValue").toString());
+        Log.d("SONGSrrr","d");
+        userObject.setAuthProvider(a.optString(UserObject.TAG_AUTHPROVIDER, "defaultValue").toString());
+        Log.d("SONGSrrr","e");
+        userObject.setUsernameID(a.optString(UserObject.TAG_USERNAMEID, "defaultValue").toString());
+        Log.d("SONGSrrr","f");
+
+        return userObject;
+
+    }
+
 
 
 

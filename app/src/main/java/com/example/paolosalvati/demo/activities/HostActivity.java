@@ -104,7 +104,7 @@ public class HostActivity extends Activity {
         //Costruisco ogetto User
         userObject = new UserObject();
         userObject.setAuthProvider("Facebook");
-        userObject.setMac(wifiObject.getWifiMAC());
+        userObject.setMac(wifiObject.getWifiBSSID());
         userObject.setSsid(wifiObject.getWifiSSID());
         userObject.setOs("Android");
         userObject.setUsernameID("paolo.salvati@hotmail.it");

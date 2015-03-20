@@ -13,7 +13,7 @@ public class UserObject {
         // TAG for JSON parsing
         public static final String TAG_USER = "host";
         public static final String TAG_CLIENT = "client";
-
+    public static final String TAG_HOST = "host";
         public static final String TAG_MAC = "mac";
         public static final String TAG_MACLIST = "MacList";
 
