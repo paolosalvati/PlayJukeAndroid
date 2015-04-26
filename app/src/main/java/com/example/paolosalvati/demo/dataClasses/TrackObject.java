@@ -15,7 +15,8 @@ public class TrackObject {
     public static final String TAG_POSITION="position";
     public static final String TAG_ALBUM="album";
     public static final String TAG_ARTIST="artist";
-
+    public static final String TAG_I_LIKE="iLike";
+    public static final String TAG_I_UN_LINE="iUnLike";
     private int id;
     private String trackname;
     private String trackID;
@@ -25,7 +26,8 @@ public class TrackObject {
     private int position;
     private String album;
     private String artist;
-
+    private String iLike;
+    private String iUnlike;
 
     public int getId() {
         return id;
@@ -62,8 +64,6 @@ public class TrackObject {
     }
     public void setPosition(int position) {   this.position = position;  }
 
-
-
     public String getAlbum() {
         return album;
     }
@@ -74,4 +74,14 @@ public class TrackObject {
         return artist;
     }
     public void setArtist(String artist) {   this.artist = artist;  }
+
+    public String getILike() {
+        return iLike;
+    }
+    public void setILike(String iLike) {   this.iLike = iLike;  }
+
+    public String getIUnLike() {
+        return iUnlike;
+    }
+    public void setIUnLike(String iUnlike) {   this.iUnlike = iUnlike;  }
 }

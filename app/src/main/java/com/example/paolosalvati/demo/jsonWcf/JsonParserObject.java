@@ -110,7 +110,7 @@ public class JsonParserObject {
 
             // Put it in the array
             arr_to_wcf.put(element);
-
+            pos=pos+1;
 
         }
         json.put(PlayListObject.TAG_TRACKS, arr_to_wcf);

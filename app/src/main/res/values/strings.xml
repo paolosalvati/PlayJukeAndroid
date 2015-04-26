@@ -9,13 +9,24 @@
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_aaa">aaa</string>
     <string name="title_activity_aaaa">aaaa</string>
-    <!--ZUMO CONNECTION-->
+    <!-- ZUMO CONNECTION -->
     <string name="azure_zumo_url">https://playjuke.azure-mobile.net/</string>
     <string name="azure_zumo_key">faMsCpUEYWcknZULBGywlrFxPBDqDM33</string>
-    <!--SPOTIFY CONNECTION-->
+    <!-- SPOTIFY CONNECTION -->
     <string name="spotify_client_id">"d8e85984e9ac47399e41f0954563cce2"</string>
     <string name="spotify_redirect_uri">my-first-android-app-login://callback</string>
-    <!--AZURE WCF-->
+    <!-- AZURE WCF -->
     <string name="azure_wcf_service_uri">http://jukeserver.cloudapp.net/JukeSvc.svc/</string>
-    CLIENT_ID
+    CLIENT_ID        <string name="title_activity_login">LoginActivity</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Login</string>
+    <string name="invalid_email">This email address is invalid</string>
+    <string name="invalid_password">Password is too short</string>
+    <string name="incorrect_password">Password is incorrect</string>
+    <string name="field_required">This field is required</string>
+    <string name="title_activity_fragment">FragmentActivity</string>
+
 </resources>

@@ -1,0 +1,158 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#96CB51">
+    <!--LinearLayout
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#96CB51"
+        android:padding="10dp"
+        android:id="@+id/rrrr"-->
+
+    <LinearLayout
+        android:id="@+id/aaaa"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal">
+
+        <TextView
+
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="PLAYJUKE."
+            android:id="@+id/textView2"
+            android:textSize="30dp"
+
+            android:textColor="#ffffff"
+            android:padding="30dp"
+            android:layout_gravity="center" />
+
+
+    </LinearLayout>
+
+
+    <!--/LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="10dp"
+        android:layout_below="@+id/rrrr"
+        android:backgroundTint="#96CB51"
+        android:id="@+id/linearLayout"-->
+
+
+    <EditText
+        android:id="@+id/etUserName"
+        android:layout_below="@id/aaaa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#96CB51"
+        android:padding="10dp"
+        android:hint="Email"
+        android:inputType="textShortMessage|textAutoCorrect|textCapSentences"
+        android:textColorHint="#ffffffff"
+        android:backgroundTint="#96CB51"
+        android:drawableLeft="@drawable/email"
+        android:clickable="false"
+        android:editable="true"
+        android:elegantTextHeight="true"
+        android:autoText="true"
+        android:singleLine="false" />
+
+    <EditText
+        android:id="@+id/etPass"
+        android:layout_below="@id/etUserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#96CB51"
+        android:layout_marginTop="-2dp"
+        android:padding="10dp"
+        android:hint="Password"
+        android:inputType="textShortMessage|textAutoCorrect|textCapSentences"
+        android:textColorHint="#ffffff"
+        android:password="true"
+        android:drawableLeft="@drawable/password"/>
+
+
+
+
+    <Button
+        android:id="@+id/btnSingIn"
+        android:layout_below="@id/etPass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Sign In"
+        style="@style/DefaultButtonText"
+        android:layout_gravity="right"
+        android:background="#6A9038"
+        android:textColor="#ffffff"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp" />
+
+
+    <!--/LinearLayout-->
+
+    <TextView
+        android:id="@+id/aaaaa"
+        android:layout_below="@id/btnSingIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Sign in."
+        android:textSize="10dp"
+
+        android:textColor="#ffffff"
+        android:padding="10dp"
+        android:layout_gravity="center" />
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/btnSingIn"
+
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical|center_horizontal">
+
+
+        <ImageButton
+            android:id="@+id/loginFacebook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/fb_button"/>
+
+        <ImageButton
+            android:id="@+id/loginGoogle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/google_button"/>
+
+
+        <ImageButton
+            android:id="@+id/loginOutlook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/microsoft_button"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

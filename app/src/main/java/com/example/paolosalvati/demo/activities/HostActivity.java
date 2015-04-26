@@ -132,7 +132,9 @@ public class HostActivity extends Activity {
 
                                         //2.A]Invoke ZUMO CUsom API to get playlist'infos
                                         //Add to the JsonObjent holding headers parameter for the HTTP Call the Spotify Access Token
-                                        input.addProperty("User", spotifyUserObject.getId());
+                                final JsonObject input = new JsonObject();
+                                input.addProperty("Token", spotifyToken);
+                                input.addProperty("User", spotifyUserObject.getId());
                                         // HTTP Call the Spotify Get Playlists
                                         zumoClient.invokeApi(
                                                 "api_pjk_spotify_get_playlists"

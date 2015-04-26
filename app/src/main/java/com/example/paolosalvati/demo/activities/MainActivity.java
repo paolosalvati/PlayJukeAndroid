@@ -3,12 +3,17 @@ package com.example.paolosalvati.demo.activities;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.example.paolosalvati.demo.R;
+import com.example.paolosalvati.demo.dataClasses.UserObject;
+import com.example.paolosalvati.demo.dataClasses.WifiObject;
+import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.microsoft.windowsazure.mobileservices.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
@@ -16,6 +21,17 @@ import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.UserAuthenticationCallback;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 
 
@@ -25,10 +41,14 @@ public class MainActivity extends ActionBarActivity {
 
     private MobileServiceClient mClient;
 
+    private     WifiObject wifiObject;
+    private     UserObject userObject;
+    private   String SERVICE_URI;//  "http://jukeserver.cloudapp.net/JukeSvc.svc/";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sign_in_screen);
 
         //Mi connetto al Mobile Service PlayJuke
         try {
@@ -47,13 +67,29 @@ public class MainActivity extends ActionBarActivity {
 
 
         //Recupero il Bottone di Login tramite l'ID
-        Button btnLogin =(Button)  findViewById(R.id.btnLogin);
+        ImageButton btnLoginFacebook =(ImageButton)  findViewById(R.id.loginFacebook);
+        ImageButton btnLoginGoogle =(ImageButton)  findViewById(R.id.loginGoogle);
+        ImageButton btnLoginMicrosoft =(ImageButton)  findViewById(R.id.loginOutlook);
          //Aggiungo Sentinella al Bottone di Login
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+        btnLoginFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                                            //Lancio l'Autenticazione via ACS sul Mobile Service di Azure
-                                            userLogin();
+                //Lancio l'Autenticazione via ACS sul Mobile Service di Azure
+                userLogin(MobileServiceAuthenticationProvider.Facebook);
+            }
+        });
+        btnLoginGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Lancio l'Autenticazione via ACS sul Mobile Service di Azure
+                userLogin(MobileServiceAuthenticationProvider.Google);
+            }
+        });
+        btnLoginMicrosoft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Lancio l'Autenticazione via ACS sul Mobile Service di Azure
+                userLogin(MobileServiceAuthenticationProvider.MicrosoftAccount);
             }
         });
     }
@@ -62,11 +98,11 @@ public class MainActivity extends ActionBarActivity {
     /**
      * Authenticate User to ZUMO Client
      */
-    private void userLogin()
+    private void userLogin(MobileServiceAuthenticationProvider authProvider)
     {
 
 
-            mClient.login(MobileServiceAuthenticationProvider.Facebook,
+            mClient.login(authProvider,
                     new UserAuthenticationCallback() {
 
                         @Override
@@ -87,14 +123,78 @@ public class MainActivity extends ActionBarActivity {
                                     zumoClient.setZumoClient(mClient);
 
 
+                                    /*
                                     //Lancio la Menu Activity
                                     Intent loadMenuActivityIntent = new Intent(getApplicationContext(), MenuActivity.class);
-                                    //loadMenuActivityIntent.putExtra("ZUMO_ACS_USER_ID",mClient.getCurrentUser().getUserId());
-                                    //loadMenuActivityIntent.putExtra("ZUMO_ACS_TOKEN",mClient.getCurrentUser().getAuthenticationToken());
-
                                     startActivity(loadMenuActivityIntent);
+                                    */
+
+                                    //Create WifiObject and Scan wifi list in range
+                                    wifiObject = new WifiObject(getApplicationContext());
+
+                                    //Create User Object
+                                    userObject = new UserObject();
+                                    userObject.setAuthProvider("Facebook");
+                                    userObject.setMac(wifiObject.getWifiMAC());
+                                    userObject.setSsid(wifiObject.getWifiSSID());
+                                    userObject.setOs("Android");
+                                    userObject.setUsernameID("paolo.salvati@hotmail.it");
+
+                                    //Con oggetti pre costruiti relativi a User Playlist e Wifi, costruisco Json per la chiamata del wcf
+                                    JsonParserObject jsonParserObject = new JsonParserObject(wifiObject,userObject);
+                                    String s_json = null;
+                                    try {
+                                        s_json = jsonParserObject.jsonClientRegistration();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
 
 
+                                    if (android.os.Build.VERSION.SDK_INT > 9) {
+                                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                                        StrictMode.setThreadPolicy(policy);
+                                    };
+
+                                    SERVICE_URI = getApplication().getString(R.string.azure_wcf_service_uri);
+                                    // POST request to WCF
+                                    HttpPost request = new HttpPost(SERVICE_URI + "ClientRegistration");
+                                    request.setHeader("Accept", "application/json");
+                                    request.setHeader("Content-type", "application/json");
+
+
+                                    StringEntity entity = null;
+                                    try {
+                                        Log.d("WebInvoke Client muffa", "uuu : " + s_json);
+                                        entity = new StringEntity(s_json, "UTF-8");
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    request.setEntity(entity);
+
+                                    // Send request to WCF service
+
+                                    DefaultHttpClient httpClient = new DefaultHttpClient();
+                                    HttpResponse httpResponse = null;
+                                    String songs="";
+
+                                    try {
+                                        ResponseHandler<String> responseHandler=new BasicResponseHandler();
+                                        String responseBody = httpClient.execute(request,responseHandler);
+                                        Log.d("FATTO",responseBody);
+                                        songs=responseBody;
+                                    } catch (ClientProtocolException e) {
+                                        Log.d("FATTO","e1"+e.getMessage());
+                                        // TODO Auto-generated catch block
+                                    } catch (IOException e) {
+                                        Log.d("FATTO","e2"+e.getMessage());
+                                    }
+                                    if(songs!="") {
+                                        //Lancio la Client Activity
+                                        Intent playActivityIntent = new Intent(getApplicationContext(), FrgmtActivity.class);
+                                        playActivityIntent.putExtra("SONGS", songs);
+                                        startActivity(playActivityIntent);
+                                    }
 
                                 } else {
                                     Log.e("MainActivity:userLogin", "User did not login successfully");
