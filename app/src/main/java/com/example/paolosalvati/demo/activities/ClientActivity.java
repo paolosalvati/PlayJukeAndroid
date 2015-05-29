@@ -1,16 +1,20 @@
 package com.example.paolosalvati.demo.activities;
 
+import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -29,6 +33,7 @@ import com.example.paolosalvati.demo.dataClasses.TrackObject;
 import com.example.paolosalvati.demo.dataClasses.TracksArrayObject;
 import com.example.paolosalvati.demo.handlers.HubHandler;
 import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
+import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyUserObject;
 import com.example.paolosalvati.demo.sqlLite.DbAdapter;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.example.paolosalvati.demo.utilities.SwipeDetector;
@@ -59,6 +64,8 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.example.paolosalvati.demo.sqlLite.*;
+import com.spotify.sdk.android.authentication.AuthenticationResponse;
+import com.spotify.sdk.android.authentication.SpotifyAuthentication;
 
 public class ClientActivity extends Activity {
 
@@ -97,8 +104,8 @@ public class ClientActivity extends Activity {
 
 
     private Handler handler = new Handler() {
-        public void handleMessage(Message msg,int position) {
-            Log.d("Swipe",msg.toString());
+        public void handleMessage(Message msg) {
+            Log.d("Swipe","rrrrrr");
             switch (msg.what)
             {
 
@@ -117,6 +124,7 @@ public class ClientActivity extends Activity {
                     */
                 case MSG_ANIMATION_REMOVE: // Start animation removing
                     View view = (View)msg.obj;
+                    Log.d("MSG_ANIMATION_REMOVE","handler");
                     view.startAnimation(getDeleteAnimation(0, (msg.arg2 == 0) ? -view.getWidth() : 2 * view.getWidth(), msg.arg1));
                     playListAdapter.notifyDataSetChanged();
 
@@ -131,13 +139,11 @@ public class ClientActivity extends Activity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_client);
 
-
         setContentView(R.layout.main);
 
-
+        ActionBar ab = getActionBar();
 
         listview = (ListView)findViewById(R.id.listview);
-
 
         //Save the application Context
         final Context context = this;
@@ -146,13 +152,7 @@ public class ClientActivity extends Activity {
         final GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
         final MobileServiceClient zumoClient = globalObjects.getZumoClient();
 
-
         dbHelper = new DbAdapter(this);
-
-
-
-
-
 
         //Get ACS ZUMO Access Token provided by the collaing MenuActivity
         Bundle datipassati = getIntent().getExtras();
@@ -163,6 +163,7 @@ public class ClientActivity extends Activity {
         NotificationsManager.handleNotifications(this, SENDER_ID, HubHandler.class);
         gcm = GoogleCloudMessaging.getInstance(this);
         String connectionString = "Endpoint=sb://playhub.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=/dLPV75NdWnCRKADlS1nqU0hl2MySOpqDhgJeVQmdJw=";
+
         hub = new NotificationHub("playhub", connectionString, this);
         registerWithNotificationHubs();
 
@@ -174,6 +175,51 @@ public class ClientActivity extends Activity {
             tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(songs);
             List<TrackObject> arrayPlayList;
             arrayPlayList= tracksArrayObject.getTracksList();
+
+
+
+            dbHelper.open();
+            for (int i=0;i<tracksArrayObject.getTracksList().size();i++){
+
+                Integer idTrack = tracksArrayObject.getTracksList().get(i).getId();
+                cursor = dbHelper.fetchPreferencesByFilter(idTrack);
+
+                Integer iLike=0;
+                Integer iUnLike=0;
+
+                while ( cursor.moveToNext() ) {
+
+
+                    iLike = cursor.getInt(cursor.getColumnIndex(DatabaseStrings.FIELD_LIKE));
+
+                    Log.d(DatabaseStrings.FIELD_LIKE, "muffaffffff ilike = " + iLike.toString());
+
+                    iUnLike = cursor.getInt(cursor.getColumnIndex(DatabaseStrings.FIELD_UN_LIKE));
+
+                    Log.d(DatabaseStrings.FIELD_LIKE, "muffaffffff iUnlike = " + iUnLike.toString());
+
+
+                    if(iLike==1) {
+                        tracksArrayObject.getTracksList().get(i).setILike("Y");
+                        tracksArrayObject.getTracksList().get(i).setIUnLike("N");
+                    }
+                    else if(iUnLike==1) {
+                        tracksArrayObject.getTracksList().get(i).setILike("N");
+                        tracksArrayObject.getTracksList().get(i).setIUnLike("Y");
+                    }
+
+
+                }
+                cursor.close();
+
+
+
+
+
+            }
+            dbHelper.close();
+
+
 
 
             //Show Track List
@@ -201,15 +247,40 @@ public class ClientActivity extends Activity {
                                 swipeDetector.getAction() == SwipeDetector.Action.LR)
                         {
                             ListView vwParentRow = (ListView)view.getParent();
-                            LinearLayout ll = (LinearLayout)vwParentRow.getChildAt(position);
+                            RelativeLayout rl = (RelativeLayout)vwParentRow.getChildAt(position);
                             //TextView child = (TextView)ll.getChildAt(0);
                             //child.setText("left");
                             //ll.setBackgroundColor(Color.RED);
-                            ImageView child = (ImageView)ll.getChildAt(3);
+                            /*
+                            ImageView child = (ImageView)rl.getChildAt(3);
                             child.setImageResource (R.drawable.unlikeicon);
-                            ll.setClickable(false);
+   */
+                            TextView child_active = (TextView)rl.getChildAt(1);
+                            String active =child_active.getText().toString();
+                            TextView child_playing = (TextView)rl.getChildAt(2);
+                            String playing =child_playing.getText().toString();
+                            //TextView child_position =(TextView)rl.getChildAt(3);
+                            //TextView child_rank =(TextView)rl.getChildAt(4);
+                            RelativeLayout child_infos =(RelativeLayout)rl.getChildAt(5);
+                            if(playing=="Y"){
+
+                                child_infos.setBackgroundResource(R.drawable.play_infos_like);
+                            }
+                            else if(active=="true"){
+                                child_infos.setBackgroundResource(R.drawable.to_play_infos_like);
+
+                            }
+                            else if(active=="false"){
+                                child_infos.setBackgroundResource(R.drawable.played_infos_like);
+                            }
+                            playListAdapter.notifyDataSetChanged();
+
+                            //ImageView child = (ImageView)rl.getChildAt(3);
+                            //child.setImageResource (R.drawable.ic_like);
+
+                            //rl.setBackgroundResource(R.drawable.li_shape_track_ilike);
                             Log.d("muffa","like");
-                            TextView tw = (TextView)ll.getChildAt(0);
+                            TextView tw = (TextView)rl.getChildAt(0);
                             Integer idTrack = Integer.parseInt( tw.getText().toString());
                             // manageUserLike.add(tw.getText().toString());
                             dbHelper.open();
@@ -254,7 +325,7 @@ public class ClientActivity extends Activity {
                             int myNum = 0;
 
                             try {
-                                TextView track = (TextView)ll.getChildAt(0);
+                                TextView track = (TextView)rl.getChildAt(0);
                                 myNum = Integer.parseInt(track.getText().toString());
                                 Log.d("muffa: int", ((Object) myNum).toString());
                             } catch(NumberFormatException nfe) {
@@ -289,6 +360,7 @@ public class ClientActivity extends Activity {
                                 e.printStackTrace();
                                 Log.d("muffa WebInvokelike", "KO : " + e.toString());
                             }
+
                             Log.d("muffa WebInvokelike", "OK : " + httpResponse.getStatusLine().toString());
 
 
@@ -302,14 +374,39 @@ public class ClientActivity extends Activity {
                                 swipeDetector.getAction() == SwipeDetector.Action.RL)
                         {
                             ListView vwParentRow = (ListView)view.getParent();
-                            LinearLayout ll = (LinearLayout)vwParentRow.getChildAt(position);
+                            RelativeLayout rl = (RelativeLayout)vwParentRow.getChildAt(position);
+
                             //ll.setBackgroundColor(Color.GREEN);
-                            ImageView child = (ImageView)ll.getChildAt(3);
-                            child.setImageResource(R.drawable.rockandrollicon);
+                            //ImageView child = (ImageView)ll.getChildAt(3);
+                            //child.setImageResource(R.drawable.rockandrollicon);
                             //child.setText("right");
-                            ll.setClickable(false);
+                            //ImageView child = (ImageView)rl.getChildAt(3);
+                            //child.setImageResource (R.drawable.ic_dislike);
+
+                            TextView child_active = (TextView)rl.getChildAt(1);
+
+                            String active =child_active.getText().toString();
+                            TextView child_playing = (TextView)rl.getChildAt(2);
+                            String playing =child_playing.getText().toString();
+
+                            RelativeLayout child_infos =(RelativeLayout)rl.getChildAt(5);
+                            if(playing=="Y"){
+
+                                child_infos.setBackgroundResource(R.drawable.play_infos_dislike);
+                            }
+                            else if(active=="true"){
+                                child_infos.setBackgroundResource(R.drawable.to_play_infos_dislike);
+
+                            }
+                            else if(active=="false"){
+                                child_infos.setBackgroundResource(R.drawable.played_infos_dislike);
+                            }
+
+                            playListAdapter.notifyDataSetChanged();
+
+                            //rl.setBackgroundResource(R.drawable.li_shape_track_iunlike);
                             Log.d("muffa","unlike");
-                            TextView tw = (TextView)ll.getChildAt(0);
+                            TextView tw = (TextView)rl.getChildAt(0);
                             //manageUserLike.add(tw.getText().toString());
                             Integer idTrack = Integer.parseInt( tw.getText().toString());
                             dbHelper.open();
@@ -352,7 +449,7 @@ public class ClientActivity extends Activity {
                             int myNum = 0;
 
                             try {
-                                TextView track = (TextView)ll.getChildAt(0);
+                                TextView track = (TextView)rl.getChildAt(0);
                                 myNum = Integer.parseInt(track.getText().toString());
                                 Log.d("muffa: int", ((Object) myNum).toString());
                             } catch(NumberFormatException nfe) {
@@ -387,21 +484,19 @@ public class ClientActivity extends Activity {
                                 e.printStackTrace();
                                 Log.d("muffa WebInvokelike", "KO : " + e.toString());
                             }
+
                             Log.d("muffa WebInvokelike", "OK : " + httpResponse.getStatusLine().toString());
 
+                       }
 
-
-
-
-                        }
                     }
 
                     // Otherwise, select an item
                     else
 
                         msg.what = MSG_CHANGE_ITEM;
-
-                    handler.sendMessage(msg);
+                    Log.d("sssssss", Integer.toString(msg.what));
+                   // handler.sendMessage(msg);
                 }
             });
 
@@ -413,7 +508,7 @@ public class ClientActivity extends Activity {
 
     }
 
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -435,7 +530,7 @@ public class ClientActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-
+*/
 
 
 
@@ -508,7 +603,7 @@ public class ClientActivity extends Activity {
 
                         while ( cursor.moveToNext() ) {
 
-
+                            
                             iLike = cursor.getInt(cursor.getColumnIndex(DatabaseStrings.FIELD_LIKE));
 
                             Log.d(DatabaseStrings.FIELD_LIKE, "muffaffffff ilike = " + iLike.toString());
@@ -770,7 +865,7 @@ public class ClientActivity extends Activity {
      */
     private Animation getDeleteAnimation(float fromX, float toX, int position)
     {
-        Log.d("Swipe","getDeleteAnimation");
+        Log.d("MSG_ANIMATION_REMOVE","getDeleteAnimation");
         Animation animation = new TranslateAnimation(fromX, toX, 0, 0);
         animation.setStartOffset(100);
         animation.setDuration(800);
@@ -789,25 +884,69 @@ public class ClientActivity extends Activity {
         public DeleteAnimationListenter(int position)
         {
             this.position = position;
-            Log.d("Swipe","1");
+            Log.d("MSG_ANIMATION_REMOVE","1");
         }
         @Override
         public void onAnimationEnd(Animation arg0) {
             //removeItem(position);
 
 
-            Log.d("Swipe","2");
+            Log.d("MSG_ANIMATION_REMOVE","2");
         }
 
         @Override
         public void onAnimationRepeat(Animation animation) {
 
-            Log.d("Swipe","3");
+            Log.d("MSG_ANIMATION_REMOVE","3");
         }
 
         @Override
         public void onAnimationStart(Animation animation) {
-            Log.d("Swipe","4");
+            Log.d("MSG_ANIMATION_REMOVE","4");
+        }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO Auto-generated method stub
+        Log.d("marina","3");
+        MenuInflater mMenuInflater = getMenuInflater();
+        Log.d("marina","4");
+        mMenuInflater.inflate(R.menu.menu_tab, menu);
+        Log.d("marina","5");
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.ab_mi_client:
+                Intent intent = new Intent(this, Act1.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.ab_mi_host:
+                SpotifyUserObject.userAuthSpotify(ClientActivity.this);
+                return true;
+            //Lancio l'Autenticazione su Spotify
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Uri uri = intent.getData();
+
+        //Se avrò vari music provider potrò eseguire il case sull uri...!!!
+        if (uri != null) {
+
+            AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
+            Intent loadPlayListActivityIntent = new Intent(getApplicationContext(), HostActivity.class);
+            GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
+            globalObjects.setSpotifyAccessToken(response.getAccessToken().toString());
+            startActivity(loadPlayListActivityIntent);
         }
     }
 

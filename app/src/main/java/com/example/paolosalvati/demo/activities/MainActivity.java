@@ -101,6 +101,7 @@ public class MainActivity extends ActionBarActivity {
     private void userLogin(MobileServiceAuthenticationProvider authProvider)
     {
 
+        Log.d("aaaaaaaa", authProvider.toString());
 
             mClient.login(authProvider,
                     new UserAuthenticationCallback() {
@@ -111,10 +112,12 @@ public class MainActivity extends ActionBarActivity {
                                                 ServiceFilterResponse response
                                                 )
                         {
+
+                            Log.d("bbbbb","tttt");
                             if (exception == null) {
                                 mClient.setContext(getApplicationContext());
                                 if (exception == null) {
-
+                                    Log.d("bbbbb","dddd");
                                     //Set User
                                     mClient.setCurrentUser(user);
 
@@ -123,12 +126,14 @@ public class MainActivity extends ActionBarActivity {
                                     zumoClient.setZumoClient(mClient);
 
 
-                                    /*
+                                    Log.d("bbbbb","sss");
                                     //Lancio la Menu Activity
                                     Intent loadMenuActivityIntent = new Intent(getApplicationContext(), MenuActivity.class);
                                     startActivity(loadMenuActivityIntent);
-                                    */
 
+
+
+                                    /*
                                     //Create WifiObject and Scan wifi list in range
                                     wifiObject = new WifiObject(getApplicationContext());
 
@@ -191,10 +196,12 @@ public class MainActivity extends ActionBarActivity {
                                     }
                                     if(songs!="") {
                                         //Lancio la Client Activity
-                                        Intent playActivityIntent = new Intent(getApplicationContext(), FrgmtActivity.class);
+                                        Intent playActivityIntent = new Intent(getApplicationContext(), ClientActivity.class);
                                         playActivityIntent.putExtra("SONGS", songs);
                                         startActivity(playActivityIntent);
                                     }
+
+                                    */
 
                                 } else {
                                     Log.e("MainActivity:userLogin", "User did not login successfully");

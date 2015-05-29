@@ -7,7 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".PlayActivity">
-
+    <!--android:id="@+id/alltracks"-->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="PLAYLIST NAME"
         android:textColor="#04cbde"
-        android:id="@+id/alltracks"
+
         android:layout_alignParentLeft="true"/>
 
 
@@ -49,9 +49,10 @@
         android:indeterminate="false" />
 
     <!-- Timer Display -->
+    <!--android:layout_above="@id/songProgressBar"-->
     <LinearLayout
         android:id="@+id/timerDisplay"
-        android:layout_above="@id/songProgressBar"
+
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="20dp"

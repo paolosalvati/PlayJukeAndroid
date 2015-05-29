@@ -1,6 +1,7 @@
 package com.example.paolosalvati.demo.dataClasses;
 
 
+import android.util.Log;
 
 /**
  * Created by Paolo on 04/02/2015.
@@ -17,6 +18,7 @@ public class TrackObject {
     public static final String TAG_ARTIST="artist";
     public static final String TAG_I_LIKE="iLike";
     public static final String TAG_I_UN_LINE="iUnLike";
+    public static final String TAG_ACTIVE="active";
     private int id;
     private String trackname;
     private String trackID;
@@ -28,6 +30,8 @@ public class TrackObject {
     private String artist;
     private String iLike;
     private String iUnlike;
+    private String active;
+    private String playing;
 
     public int getId() {
         return id;
@@ -52,12 +56,12 @@ public class TrackObject {
     public String getRank() {
         return rank;
     }
-    public void setRank(String rank) {   this.rank = rank;  }
+    public void setRank(String rank) {   this.rank = rank; }
 
     public int getDislikes() {
         return dislikes;
     }
-    public void setDislikes(int dislikes) {   this.dislikes = dislikes;  }
+    public void setDislikes(int dislikes) {   this.dislikes = dislikes; }
 
     public int getPosition() {
         return position;
@@ -84,4 +88,15 @@ public class TrackObject {
         return iUnlike;
     }
     public void setIUnLike(String iUnlike) {   this.iUnlike = iUnlike;  }
+
+    public String getActive() {
+        return active;
+    }
+    public void setActive(String active) {   this.active = active;  }
+
+    public String getPlaying() {
+        return playing;
+    }
+    public void setPlaying(String playing) {   this.playing = playing;  }
+
 }

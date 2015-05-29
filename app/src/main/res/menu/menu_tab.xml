@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/ab_mi_client"
+        android:showAsAction="always"
+        android:title="Nuovo"
+        android:icon="@android:drawable/ic_media_play"/>
+    <item
+        android:id="@+id/ab_mi_host"
+        android:showAsAction="always"
+        android:title="Elenco"
+        android:icon="@android:drawable/ic_menu_share"/>
+
+</menu>

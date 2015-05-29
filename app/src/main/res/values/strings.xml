@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="up">\u25B3</string>
+    <string name="down">\u25BD</string>
+    <string name="same">-</string>
+
+    <color name="gray">#333333</color>
+    <color name="red">#FF3300</color>
+    <color name="green">#00CC33</color>
+
     <string name="app_name">Demo</string>
     <string name="hello_world">hello_world</string>
     <string name="main_menu_pub_message">Are you Pub Music Manager? Keep sharing your PlayList!</string>
@@ -17,7 +25,7 @@
     <string name="spotify_redirect_uri">my-first-android-app-login://callback</string>
     <!-- AZURE WCF -->
     <string name="azure_wcf_service_uri">http://jukeserver.cloudapp.net/JukeSvc.svc/</string>
-    CLIENT_ID        <string name="title_activity_login">LoginActivity</string>
+    CLIENT_ID                    <string name="title_activity_login">LoginActivity</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -28,5 +36,11 @@
     <string name="incorrect_password">Password is incorrect</string>
     <string name="field_required">This field is required</string>
     <string name="title_activity_fragment">FragmentActivity</string>
+    <string name="title_activity_tab">TabActivity</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_activity_act1">Act1</string>
+    <string name="title_activity_act2">Act2</string>
 
 </resources>

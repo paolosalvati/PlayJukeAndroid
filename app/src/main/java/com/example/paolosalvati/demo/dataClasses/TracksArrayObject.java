@@ -1,5 +1,7 @@
 package com.example.paolosalvati.demo.dataClasses;
 
+import android.util.Log;
+
 import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyAllTracksObject;
 import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyTracksObject;
 
@@ -66,7 +68,9 @@ public class TracksArrayObject {
             track.setPosition(c.optInt(TrackObject.TAG_POSITION, 0));
             track.setAlbum(c.optString(TrackObject.TAG_ALBUM, "defaultValue").toString());
             track.setArtist(c.optString(TrackObject.TAG_ARTIST, "defaultValue").toString());
-
+            track.setRank(c.optString(TrackObject.TAG_RANK, "-").toString());
+            track.setActive(c.optString(TrackObject.TAG_ACTIVE, "true").toString());
+            track.setPlaying("N");
             appoList.add(track);
 
         }
@@ -85,6 +89,23 @@ public class TracksArrayObject {
 
 
         this.tracksList=appoList;
+
+        if(this.tracksList.get(0).getActive()=="true"){
+            this.tracksList.get(0).setPlaying("Y");
+        }
+        else {
+            String song_before_active=this.tracksList.get(0).getActive();
+            for (int i = 1; i < this.tracksList.size(); i++) {
+                if(this.tracksList.get(i).getActive()=="true" && song_before_active=="false" ){
+                    this.tracksList.get(i).setPlaying("Y");
+                    Log.d("Flag Active",this.tracksList.get(i).getTrackName());
+                    return;
+                }
+                else {
+                song_before_active=this.tracksList.get(i).getActive();
+                }
+            }
+        }
 
     }
 

@@ -22,14 +22,17 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" /> <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <application
         android:name=".utilities.GlobalObjects"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+
+        android:theme="@style/Theme.AppCompat" >
+
+
+
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.FrgmtActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize" >
@@ -49,7 +52,19 @@
         </activity>
         <activity
             android:name=".activities.ClientActivity"
-            android:label="ClientActivity" >
+            android:label="ClientActivity"
+            android:launchMode="singleInstance" >
+            // An intent filter that will receive the response from the authentication service
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="callback"
+                    android:scheme="my-first-android-app-login" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activities.MenuActivity"
@@ -86,9 +101,24 @@
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" >
         </activity>
-        <activity
+        <!--
+        activity
             android:name=".activities.FrgmtActivity"
             android:label="@string/title_activity_fragment" >
+        </activity
+        -->
+        <activity
+            android:name=".activities.TabMenuActivity"
+            android:theme="@android:style/Theme.Holo"
+            android:label="@string/title_activity_tab" >
+        </activity>
+        <activity
+            android:name=".activities.Act1"
+            android:label="@string/title_activity_act1" >
+        </activity>
+        <activity
+            android:name=".activities.Act2"
+            android:label="@string/title_activity_act2" >
         </activity>
     </application>
 
