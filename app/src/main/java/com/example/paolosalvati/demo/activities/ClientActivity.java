@@ -64,8 +64,11 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.example.paolosalvati.demo.sqlLite.*;
+import com.spotify.sdk.android.authentication.AuthenticationClient;
+import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.authentication.SpotifyAuthentication;
+//import com.spotify.sdk.android.authentication.AuthenticationResponse;
+//import com.spotify.sdk.android.authentication.SpotifyAuthentication;
 
 public class ClientActivity extends Activity {
 
@@ -141,9 +144,10 @@ public class ClientActivity extends Activity {
 
         setContentView(R.layout.main);
 
-        ActionBar ab = getActionBar();
+
 
         listview = (ListView)findViewById(R.id.listview);
+        ActionBar ab = getActionBar();
 
         //Save the application Context
         final Context context = this;
@@ -549,6 +553,7 @@ public class ClientActivity extends Activity {
                 return null;
             }
         }.execute(null, null, null);
+        Log.d("registerWithNotificationHubs","0k");
     }
 
 
@@ -569,8 +574,8 @@ public class ClientActivity extends Activity {
     }
     //This is the handler that will manager to process the broadcast intent
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
+                  @Override
+            public void onReceive(Context context, Intent intent) {
 
             // Extract data included in the Intent
             String message = intent.getStringExtra("message");
@@ -905,15 +910,19 @@ public class ClientActivity extends Activity {
             Log.d("MSG_ANIMATION_REMOVE","4");
         }
     }
+
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // TODO Auto-generated method stub
+
         Log.d("marina","3");
         MenuInflater mMenuInflater = getMenuInflater();
         Log.d("marina","4");
         mMenuInflater.inflate(R.menu.menu_tab, menu);
         Log.d("marina","5");
         return true;
+
     }
 
     @Override
@@ -925,6 +934,11 @@ public class ClientActivity extends Activity {
                 startActivity(intent);
                 return true;
             case R.id.ab_mi_host:
+
+
+
+
+
                 SpotifyUserObject.userAuthSpotify(ClientActivity.this);
                 return true;
             //Lancio l'Autenticazione su Spotify
@@ -934,6 +948,8 @@ public class ClientActivity extends Activity {
         }
     }
 
+
+/*
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -941,13 +957,53 @@ public class ClientActivity extends Activity {
 
         //Se avrò vari music provider potrò eseguire il case sull uri...!!!
         if (uri != null) {
-
+            Log.d("Marina","a");
             AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
+            Log.d("Marina","b");
             Intent loadPlayListActivityIntent = new Intent(getApplicationContext(), HostActivity.class);
+            Log.d("Marina","c");
             GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
+            Log.d("Marina","d");
             globalObjects.setSpotifyAccessToken(response.getAccessToken().toString());
+            Log.d("Marina","e");
             startActivity(loadPlayListActivityIntent);
+            Log.d("Marina","f");
         }
     }
+*/
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        Uri uri = intent.getData();
+        if (uri != null) {
+            AuthenticationResponse response = AuthenticationResponse.fromUri(uri);
+
+            switch (response.getType()) {
+                // Response was successful and contains auth token
+                case TOKEN:
+
+                    Log.d("Marina","b");
+                    Intent loadPlayListActivityIntent = new Intent(getApplicationContext(), HostActivity.class);
+                    Log.d("Marina","c");
+                    GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
+                    Log.d("Marina","d");
+                    globalObjects.setSpotifyAccessToken(response.getAccessToken().toString());
+                    Log.d("Marina","e");
+                    startActivity(loadPlayListActivityIntent);
+                    Log.d("Marina","f");
+                    break;
+
+                // Auth flow returned an error
+                case ERROR:
+                    // Handle error response
+                    break;
+
+                // Most likely auth flow was cancelled
+                default:
+                    // Handle other cases
+            }
+        }
+    }
 }

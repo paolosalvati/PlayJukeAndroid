@@ -1,9 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="2dp">
+
+    <com.example.paolosalvati.demo.utilities.SquareImageView
+        android:id="@+id/layout_playlist_imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/aaaaa"
+        />
+
+    <TextView
+        android:drawableTop="@drawable/li_underline_green"
+        android:id="@+id/layout_playlist_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="bottom"
+        android:textColor="@android:color/white"
+        android:background="#99000000"
+        android:text="Rock"/>
+
+</FrameLayout>
+
+<!--RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:layout_width="wrap_content"
+
+
+
+    <ImageView
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/layout_playlist_name"/>
-</RelativeLayout>
+        android:id="@+id/layout_playlist_imageView"
+        android:src="@drawable/aaaaa"
+
+        android:layout_centerInParent="true"
+
+        />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_playlist_name"
+        android:layout_alignParentTop="true"
+        android:gravity="center_horizontal"
+        android:text="Rock"
+        android:layout_marginTop="30dp"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_playlist_num_track"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal"
+        android:textSize="30sp"
+        android:layout_marginBottom="30dp"
+        android:text="Total Tracks: #99"/>
+
+</RelativeLayout-->

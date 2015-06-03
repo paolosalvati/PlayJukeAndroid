@@ -3,6 +3,7 @@ package com.example.paolosalvati.demo.activities;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -18,12 +19,14 @@ import com.example.paolosalvati.demo.R;
 import com.example.paolosalvati.demo.dataClasses.UserObject;
 import com.example.paolosalvati.demo.dataClasses.WifiObject;
 import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
+import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyUserObject;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.microsoft.windowsazure.mobileservices.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.UserAuthenticationCallback;
+import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -153,6 +156,7 @@ public class FrgmtActivity extends android.support.v4.app.FragmentActivity {
                     {
 
                         Log.d("bbbbb","tttt");
+
                         if (exception == null) {
                             mClient.setContext(getApplicationContext());
                             if (exception == null) {
@@ -237,14 +241,20 @@ public class FrgmtActivity extends android.support.v4.app.FragmentActivity {
                                         //Lancio la Client Activity
 
                                         //Intent playActivityIntent = new Intent(getApplicationContext(), TabMenuActivity.class);
+
                                         Intent playActivityIntent = new Intent(getApplicationContext(), ClientActivity.class);
                                         playActivityIntent.putExtra("SONGS", songs);
                                         startActivity(playActivityIntent);
                                     } else{
-                                        Intent playActivityIntent = new Intent(getApplicationContext(), TabMenuActivity.class);
+
+
+
+
+                                        SpotifyUserObject.userAuthSpotify(FrgmtActivity.this);
+                                        //Intent playActivityIntent = new Intent(getApplicationContext(), TabMenuActivity.class);
                                         //Intent playActivityIntent = new Intent(getApplicationContext(), ClientActivity.class);
                                         //playActivityIntent.putExtra("SONGS", songs);
-                                        startActivity(playActivityIntent);
+                                        //startActivity(playActivityIntent);
                                     }
 
 
@@ -299,6 +309,39 @@ public class FrgmtActivity extends android.support.v4.app.FragmentActivity {
         builder.create().show();
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
 
+        Uri uri = intent.getData();
+        if (uri != null) {
+            AuthenticationResponse response = AuthenticationResponse.fromUri(uri);
+
+            switch (response.getType()) {
+                // Response was successful and contains auth token
+                case TOKEN:
+
+                    Log.d("Marina","b");
+                    Intent loadPlayListActivityIntent = new Intent(getApplicationContext(), HostActivity.class);
+                    Log.d("Marina","c");
+                    GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
+                    Log.d("Marina","d");
+                    globalObjects.setSpotifyAccessToken(response.getAccessToken().toString());
+                    Log.d("Marina","e");
+                    startActivity(loadPlayListActivityIntent);
+                    Log.d("Marina","f");
+                    break;
+
+                // Auth flow returned an error
+                case ERROR:
+                    // Handle error response
+                    break;
+
+                // Most likely auth flow was cancelled
+                default:
+                    // Handle other cases
+            }
+        }
+    }
 
 }

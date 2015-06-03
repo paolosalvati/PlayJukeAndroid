@@ -87,13 +87,14 @@
     <orderEntry type="library" exported="" name="notification-hubs-0.4" level="project" />
     <orderEntry type="library" exported="" name="mobileservices-1.1.5" level="project" />
     <orderEntry type="library" exported="" name="gson-2.2.2" level="project" />
-    <orderEntry type="library" exported="" name="spotifysdk-1.0.0-beta6" level="project" />
     <orderEntry type="library" exported="" name="mobileservices-1.1.5-sources" level="project" />
+    <orderEntry type="library" exported="" name="spotify-player-1.0.0-beta9-" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="play-services-6.5.87" level="project" />
     <orderEntry type="library" exported="" name="guava-16.0.1" level="project" />
     <orderEntry type="library" exported="" name="notifications-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="spotify-auth-1.0.0-beta9-" level="project" />
   </component>
 </module>
 

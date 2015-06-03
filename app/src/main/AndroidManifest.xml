@@ -41,9 +41,21 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="callback"
+                    android:scheme="my-first-android-app-login" />
+            </intent-filter>
+
         </activity>
         <activity
             android:name=".activities.HostActivity"
+            android:theme="@android:style/Theme.Holo.Light"
             android:label="@string/title_activity_load_play_lists" >
         </activity>
         <activity
@@ -52,6 +64,8 @@
         </activity>
         <activity
             android:name=".activities.ClientActivity"
+
+            android:theme="@android:style/Theme.Holo.Light"
             android:label="ClientActivity"
             android:launchMode="singleInstance" >
             // An intent filter that will receive the response from the authentication service
@@ -120,6 +134,7 @@
             android:name=".activities.Act2"
             android:label="@string/title_activity_act2" >
         </activity>
+
     </application>
 
 </manifest>

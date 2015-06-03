@@ -1,5 +1,6 @@
 package com.example.paolosalvati.demo.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -7,9 +8,11 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -34,8 +37,11 @@ import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,9 +81,10 @@ public class HostActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("Marina","g");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host);
-
+        ActionBar ab = getActionBar();
         SERVICE_URI = getApplication().getString(R.string.azure_wcf_service_uri);
 
         final GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
@@ -114,6 +121,7 @@ public class HostActivity extends Activity {
         //Add to the JsonObjent holding headers parameter for the HTTP Call the Spotify Access Token
         input.addProperty("Token", spotifyToken);
         //1.A]Invoke ZUMO CUsom API to get users'infos
+        Log.d("Marina","h");
         zumoClient.invokeApi("api_pjk_spotify_get_user", input,
                 HttpPost.METHOD_NAME, null,
                 new ApiJsonOperationCallback()
@@ -122,9 +130,13 @@ public class HostActivity extends Activity {
                     @Override
                     public void onCompleted(JsonElement jsonData,Exception error,ServiceFilterResponse response)
                     {
+                        Log.d("Marina","i");
+                        Log.d("Marina",response.getContent().toString());
                         String jsonApiUserResponse = response.getContent().toString();
+                        Log.d("Marina","sssss1");
                         if (jsonApiUserResponse != null)
                         {
+                            Log.d("Marina","sssss2");
                             try
                             {
                                 JSONObject jsonUserObj = new JSONObject(jsonApiUserResponse);
@@ -135,6 +147,9 @@ public class HostActivity extends Activity {
                                 final JsonObject input = new JsonObject();
                                 input.addProperty("Token", spotifyToken);
                                 input.addProperty("User", spotifyUserObject.getId());
+                                Log.d("Marina","sssss3");
+                                Log.d("Marina",spotifyUserObject.getId().toString());
+
                                         // HTTP Call the Spotify Get Playlists
                                         zumoClient.invokeApi(
                                                 "api_pjk_spotify_get_playlists"
@@ -145,7 +160,7 @@ public class HostActivity extends Activity {
                                                     @Override
                                                     public void onCompleted(JsonElement jsonData, Exception error, ServiceFilterResponse response) {
                                                         String jsonApiPlayListrResponse = response.getContent().toString();
-
+                                                        Log.d("Marina t", response.getContent().toString());
                                                         if (jsonApiPlayListrResponse != null) {
                                                             try {
                                                                 JSONObject jsonPlayListObj = new JSONObject(jsonApiPlayListrResponse);
@@ -156,7 +171,7 @@ public class HostActivity extends Activity {
 
                                                                 //SHOW PLAYLIST
                                                                 playListAdapter = new PlaylistHostAdapetr(spotifyAllPlaylistsObject.getArrayALLPlayList());
-                                                                ListView allPlayLists = (ListView) findViewById(R.id.allPlayList);
+                                                                GridView allPlayLists = (GridView) findViewById(R.id.allPlayList);
                                                                 allPlayLists.setAdapter(playListAdapter);
 
                                                                 //SETTO l'setOnItemClickListener per invocare il WCF passando la playlist selezionata
@@ -175,8 +190,9 @@ public class HostActivity extends Activity {
                                                                         playListObject.setPlaylistuserID(spotifyUserObject.getId());
                                                                         playListObject.setPlaylistName(playlistItem.getName());
 
-
-
+                                                                        Log.d("Marina s", spotifyUserObject.getId());
+                                                                        Log.d("Marina s",playlistItem.getID());
+                                                                                Log.d("Marina s",spotifyToken);
                                                                         //INIZIO RECUPERO LE TRACKS
                                                                         input.addProperty("User", spotifyUserObject.getId());
                                                                         input.addProperty("Playlist", playlistItem.getID());
@@ -191,7 +207,7 @@ public class HostActivity extends Activity {
                                                                                     @Override
                                                                                     public void onCompleted(JsonElement jsonData, Exception error, ServiceFilterResponse response) {
                                                                                         String jsonApiTracksResponse = response.getContent().toString();
-                                                                                        Log.i("Paolo:LoadPlayListsActivity:Track", response.getContent().toString());// getAsJsonObject().getAsString());
+                                                                                        Log.i("Paolo:LoadPlayListsActivity:Track1", response.getContent().toString());// getAsJsonObject().getAsString());
                                                                                         if (jsonApiTracksResponse != null) {
 
                                                                                             try {
@@ -289,27 +305,117 @@ public class HostActivity extends Activity {
     }
 
 
+
+
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_load_play_lists, menu);
+
+        Log.d("marina","3");
+        MenuInflater mMenuInflater = getMenuInflater();
+        Log.d("marina","4");
+        mMenuInflater.inflate(R.menu.menu_tab, menu);
+        Log.d("marina","5");
         return true;
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.ab_mi_client:
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+
+
+                //Create WifiObject and Scan wifi list in range
+                wifiObject = new WifiObject(getApplicationContext());
+
+                //Create User Object
+                userObject = new UserObject();
+                userObject.setAuthProvider("Facebook");
+                userObject.setMac(wifiObject.getWifiMAC());
+                userObject.setSsid(wifiObject.getWifiSSID());
+                userObject.setOs("Android");
+                userObject.setUsernameID("paolo.salvati@hotmail.it");
+
+                //Con oggetti pre costruiti relativi a User Playlist e Wifi, costruisco Json per la chiamata del wcf
+                JsonParserObject jsonParserObject = new JsonParserObject(wifiObject,userObject);
+                String s_json = null;
+                try {
+                    s_json = jsonParserObject.jsonClientRegistration();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                if (android.os.Build.VERSION.SDK_INT > 9) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+                };
+
+                SERVICE_URI = getApplication().getString(R.string.azure_wcf_service_uri);
+                // POST request to WCF
+                HttpPost request = new HttpPost(SERVICE_URI + "ClientRegistration");
+                request.setHeader("Accept", "application/json");
+                request.setHeader("Content-type", "application/json");
+
+
+                StringEntity entity = null;
+                try {
+                    Log.d("WebInvoke Client muffa", "uuu : " + s_json);
+                    entity = new StringEntity(s_json, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                request.setEntity(entity);
+
+                // Send request to WCF service
+
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpResponse httpResponse = null;
+                String songs="";
+
+                try {
+                    ResponseHandler<String> responseHandler=new BasicResponseHandler();
+                    String responseBody = httpClient.execute(request,responseHandler);
+                    Log.d("FATTO",responseBody);
+                    songs=responseBody;
+                } catch (ClientProtocolException e) {
+                    Log.d("FATTO","e1"+e.getMessage());
+                    // TODO Auto-generated catch block
+                } catch (IOException e) {
+                    Log.d("FATTO","e2"+e.getMessage());
+                }
+                if(songs!="") {
+                    //Lancio la Client Activity
+
+                    //Intent playActivityIntent = new Intent(getApplicationContext(), TabMenuActivity.class);
+
+                    Intent playActivityIntent = new Intent(getApplicationContext(), ClientActivity.class);
+                    playActivityIntent.putExtra("SONGS", songs);
+                    startActivity(playActivityIntent);
+                } else{
+                    Intent playActivityIntent = new Intent(getApplicationContext(), TabMenuActivity.class);
+                    //Intent playActivityIntent = new Intent(getApplicationContext(), ClientActivity.class);
+                    //playActivityIntent.putExtra("SONGS", songs);
+                    startActivity(playActivityIntent);
+                }
+
+
+
+                return true;
+            case R.id.ab_mi_host:
+
+                return true;
+            //Lancio l'Autenticazione su Spotify
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
+
 
 
 }

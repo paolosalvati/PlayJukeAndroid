@@ -32,12 +32,13 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.microsoft.windowsazure.messaging.NotificationHub;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.notifications.NotificationsManager;
-import com.spotify.sdk.android.Spotify;
-import com.spotify.sdk.android.playback.Config;
-import com.spotify.sdk.android.playback.Player;
-import com.spotify.sdk.android.playback.PlayerNotificationCallback;
-import com.spotify.sdk.android.playback.PlayerState;
-import com.spotify.sdk.android.playback.PlayerStateCallback;
+import com.spotify.sdk.android.player.Config;
+import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.PlayerNotificationCallback;
+import com.spotify.sdk.android.player.PlayerState;
+import com.spotify.sdk.android.player.PlayerStateCallback;
+import com.spotify.sdk.android.player.Spotify;
+
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -56,7 +57,13 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class PlayActivity extends ActionBarActivity implements  PlayerNotificationCallback, SeekBar.OnSeekBarChangeListener  {
+import com.spotify.sdk.android.player.Spotify;
+import com.spotify.sdk.android.player.ConnectionStateCallback;
+import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.PlayerNotificationCallback;
+import com.spotify.sdk.android.player.PlayerState;
+
+public class PlayActivity extends ActionBarActivity implements PlayerNotificationCallback, SeekBar.OnSeekBarChangeListener  {
     private UserObject userObject;
     private PlayListObject playListObject;
     private TracksArrayObject tracksArrayObject;
@@ -78,7 +85,7 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
     private Player mPlayer;
 
-
+private Spotify spotify;
 
     private SeekBar songProgressBar;
     // Handler to update UI timer, progress bar etc,.
@@ -163,16 +170,22 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
                 e.printStackTrace();
             }
 
-
+        Log.d("SONGSrrr","fff");
             //Costruisco il Player
-            Config playerConfig = new Config(this, spotifyToken, "d8e85984e9ac47399e41f0954563cce2");
-            Spotify spotify = new Spotify();
-            mPlayer = spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
-                @Override
-                public void onInitialized() {
+        try {
+        Config playerConfig = new Config(this, spotifyToken, "d8e85984e9ac47399e41f0954563cce2",Config.DeviceType.SMARTPHONE );
 
+
+            Log.d("SONGSrrr","ggg");
+            mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver()  {
+
+
+
+                @Override
+                public void onInitialized(Player mPlayer) {
+                    Log.d("SONGSrrr", "7");
                     mPlayer.addPlayerNotificationCallback(PlayActivity.this);
-                    Log.d("Play: ",   arrayPlayList.get(trackPos).getTrackName());
+                    Log.d("Play: ", arrayPlayList.get(trackPos).getTrackName());
                     mPlayer.play("spotify:track:" + arrayPlayList.get(trackPos).getTrackID());
 
                     // set Progress bar values
@@ -185,11 +198,15 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
                 @Override
                 public void onError(Throwable throwable) {
-
+                    Log.d("SONGSrrr", "7" + throwable.getMessage().toString());
                 }
 
             });
 
+        } catch (Exception e) {
+
+            Log.d("SONGSrrr", "7"+ e.getMessage().toString());
+        };
 
 
     }
@@ -241,8 +258,8 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
                    }
                     else{
                        json.put("mac", userObject.getMac());
-                       json.put("trackid", arrayPlayList.get(trackPos).getId());
-                       json.put("plistid",  1122 );
+                       json.put("trackid",1011);// arrayPlayList.get(trackPos).getId());
+                       json.put("plistid",  1158 );
                    }
 
                 } catch (JSONException e) {
@@ -264,6 +281,7 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
                 ;
 
 
+
                 // POST request to WCF
                 HttpPost request = new HttpPost(SERVICE_URI + "DeactivateTrack");
                 request.setHeader("Accept", "application/json");
@@ -281,8 +299,10 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
                 DefaultHttpClient httpClient = new DefaultHttpClient();
                 HttpResponse httpResponse = null;
 
+
                 try {
                     httpResponse = httpClient.execute(request);
+                    Log.d("WebInvoke DeactivateTrack", "OK");
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.d("WebInvoke DeactivateTrack", "KO : " + e.toString());
@@ -359,6 +379,7 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
 
             // Extract data included in the Intent
             String songs = intent.getStringExtra("message");
+            Log.d("dddsssssdddd",songs);
             if (songs != null) {
                 try {
 
@@ -487,6 +508,10 @@ public class PlayActivity extends ActionBarActivity implements  PlayerNotificati
         */
     }
 
-
+    @Override
+    protected void onDestroy() {
+        Spotify.destroyPlayer(this);
+        super.onDestroy();
+    }
 
 }

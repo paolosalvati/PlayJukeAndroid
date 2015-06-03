@@ -19,8 +19,9 @@ import com.example.paolosalvati.demo.jsonWcf.JsonParserObject;
 import com.example.paolosalvati.demo.spotifyDataClasses.SpotifyUserObject;
 import com.example.paolosalvati.demo.utilities.GlobalObjects;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.authentication.SpotifyAuthentication;
-import com.spotify.sdk.android.playback.ConnectionStateCallback;
+import com.spotify.sdk.android.player.ConnectionStateCallback;
+//import com.spotify.sdk.android.authentication.SpotifyAuthentication;
+//import com.spotify.sdk.android.playback.ConnectionStateCallback;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -38,7 +39,7 @@ import java.io.UnsupportedEncodingException;
 
 
 public class MenuActivity extends Activity implements
-         ConnectionStateCallback {
+        ConnectionStateCallback {
 
 
     //private   String CLIENT_ID ;//"d8e85984e9ac47399e41f0954563cce2";
@@ -163,7 +164,7 @@ public class MenuActivity extends Activity implements
 
         //Se avrò vari music provider potrò eseguire il case sull uri...!!!
         if (uri != null) {
-
+/*
             AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
             Intent loadPlayListActivityIntent = new Intent(getApplicationContext(), HostActivity.class);
             //Bundle datipassati = getIntent().getExtras();
@@ -174,7 +175,9 @@ public class MenuActivity extends Activity implements
             //loadPlayListActivityIntent.putExtra("ZUMO_ACS_USER_ID",zumo_acs_user_id);
             GlobalObjects globalObjects = ((GlobalObjects) getApplicationContext());
             globalObjects.setSpotifyAccessToken(response.getAccessToken().toString());
+
             startActivity(loadPlayListActivityIntent);
+            */
         }
     }
 
@@ -198,10 +201,7 @@ public class MenuActivity extends Activity implements
         Log.d("MenuActivity", "Temporary error occurred");
     }
 
-    @Override
-    public void onNewCredentials(String s) {
-        Log.d("MenuActivity", "User credentials blob received");
-    }
+
 
     @Override
     public void onConnectionMessage(String message) {
