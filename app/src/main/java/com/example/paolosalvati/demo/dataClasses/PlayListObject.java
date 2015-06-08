@@ -24,6 +24,7 @@ public class PlayListObject {
 
     private String playlistuserID;
     private String playlistID;
+    private String imageUri;
     private String playlistname;
    // private List<TrackObject> tracks;
 
@@ -70,6 +71,9 @@ public class PlayListObject {
     public void setPlaylistName(String playlistname) {
         this.playlistname= playlistname;
     }
+
+    public String getPlaylistImageUri() {return imageUri;}
+    public void setPlaylistImageUri(String imageUri) {this.imageUri = imageUri;}
 
    // public List<TrackObject> getTracks() {
    //     return tracks;

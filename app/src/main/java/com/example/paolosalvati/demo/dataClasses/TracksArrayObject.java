@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class TracksArrayObject {
 
-    List<TrackObject> tracksList;
+    ArrayList<TrackObject> tracksList;
 
     public TracksArrayObject(SpotifyAllTracksObject spotifyAllTracksObject) {
-        List<TrackObject> appoList = new ArrayList<TrackObject>();
+        ArrayList<TrackObject> appoList = new ArrayList<TrackObject>();
         int i = 0;
         //Creating the element to populate the array
         for (SpotifyTracksObject spotifyTrack : spotifyAllTracksObject.getArrayALLTracks()) {
@@ -110,7 +110,7 @@ public class TracksArrayObject {
     }
 
 
-    public List<TrackObject> getTracksList() {
+    public ArrayList<TrackObject> getTracksList() {
         return tracksList;
     }
 }

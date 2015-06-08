@@ -189,7 +189,7 @@ public class HostActivity extends Activity {
                                                                         playListObject.setPlaylistID(playlistItem.getID());
                                                                         playListObject.setPlaylistuserID(spotifyUserObject.getId());
                                                                         playListObject.setPlaylistName(playlistItem.getName());
-
+                                                                        playListObject.setPlaylistImageUri(playlistItem.getImageUri());
                                                                         Log.d("Marina s", spotifyUserObject.getId());
                                                                         Log.d("Marina s",playlistItem.getID());
                                                                                 Log.d("Marina s",spotifyToken);
@@ -261,6 +261,7 @@ public class HostActivity extends Activity {
                                                                                                 //Chiamata all'Activity del Player
                                                                                                 Intent loadPlayActivityIntent = new Intent(getApplicationContext(), PlayActivity.class);
                                                                                                 loadPlayActivityIntent.putExtra("SONGS", s_json);
+                                                                                                loadPlayActivityIntent.putExtra("IMAGE_URI", playListObject.getPlaylistImageUri());
                                                                                                 startActivity(loadPlayActivityIntent);
 
 

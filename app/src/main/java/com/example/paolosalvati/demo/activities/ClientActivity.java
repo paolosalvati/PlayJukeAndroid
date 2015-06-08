@@ -1,11 +1,13 @@
 package com.example.paolosalvati.demo.activities;
 
 import android.app.ActionBar;
+import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -51,6 +54,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -105,6 +109,7 @@ public class ClientActivity extends Activity {
     public static final int MSG_REMOVE_ITEM 		= 10;
     public static final int MSG_RENAME_ITEM 		= 11;
 
+    public View.OnTouchListener gestureListener;
 
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -125,9 +130,14 @@ public class ClientActivity extends Activity {
                     setCountPurchaseProduct();
                     break;
                     */
+                case MSG_CHANGE_ITEM: // Do / not do case
+                    Log.d("MSG_CHANGE_ITEM","handler");
+                playListAdapter.notifyDataSetChanged();
+                    break;
                 case MSG_ANIMATION_REMOVE: // Start animation removing
                     View view = (View)msg.obj;
                     Log.d("MSG_ANIMATION_REMOVE","handler");
+
                     view.startAnimation(getDeleteAnimation(0, (msg.arg2 == 0) ? -view.getWidth() : 2 * view.getWidth(), msg.arg1));
                     playListAdapter.notifyDataSetChanged();
 
@@ -143,7 +153,7 @@ public class ClientActivity extends Activity {
         //setContentView(R.layout.activity_client);
 
         setContentView(R.layout.main);
-
+        ArrayList<TrackObject> arrayPlayList;
 
 
         listview = (ListView)findViewById(R.id.listview);
@@ -169,15 +179,150 @@ public class ClientActivity extends Activity {
         String connectionString = "Endpoint=sb://playhub.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=/dLPV75NdWnCRKADlS1nqU0hl2MySOpqDhgJeVQmdJw=";
 
         hub = new NotificationHub("playhub", connectionString, this);
-        registerWithNotificationHubs();
+        //registerWithNotificationHubs();
 
 
+
+
+
+
+
+
+
+
+
+
+        try{
+        JsonParserObject jsonParserObject = new JsonParserObject();
+        playListObject = jsonParserObject.jsonClientRegistrationResponseGetPlaylist(songs);
+        tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(songs);
+
+        arrayPlayList= tracksArrayObject.getTracksList();
+
+
+
+        dbHelper.open();
+        for (int i=0;i<tracksArrayObject.getTracksList().size();i++){
+
+            Integer idTrack = tracksArrayObject.getTracksList().get(i).getId();
+            cursor = dbHelper.fetchPreferencesByFilter(idTrack);
+
+            Integer iLike=0;
+            Integer iUnLike=0;
+
+            while ( cursor.moveToNext() ) {
+
+
+                iLike = cursor.getInt(cursor.getColumnIndex(DatabaseStrings.FIELD_LIKE));
+
+                Log.d(DatabaseStrings.FIELD_LIKE, "muffaffffff ilike = " + iLike.toString());
+
+                iUnLike = cursor.getInt(cursor.getColumnIndex(DatabaseStrings.FIELD_UN_LIKE));
+
+                Log.d(DatabaseStrings.FIELD_LIKE, "muffaffffff iUnlike = " + iUnLike.toString());
+
+
+                if(iLike==1) {
+                    tracksArrayObject.getTracksList().get(i).setILike("Y");
+                    tracksArrayObject.getTracksList().get(i).setIUnLike("N");
+                }
+                else if(iUnLike==1) {
+                    tracksArrayObject.getTracksList().get(i).setILike("N");
+                    tracksArrayObject.getTracksList().get(i).setIUnLike("Y");
+                }
+
+
+            }
+            cursor.close();
+
+
+
+
+
+        }
+        dbHelper.close();
+
+
+            gestureListener = new View.OnTouchListener() {
+                private int padding = 0;
+
+                private int initialx = 0;
+                private int currentx = 0;
+                //private  ViewHolder viewHolder;
+                public boolean onTouch(View v, MotionEvent event) {
+                    if ( event.getAction() == MotionEvent.ACTION_DOWN)
+                    {
+                        padding = 0;
+                        initialx = (int) event.getX();
+                        currentx = (int) event.getX();
+                        //viewHolder = ((ViewHolder) v.getTag());
+                    }
+                    if ( event.getAction() == MotionEvent.ACTION_MOVE)
+                    {
+                        currentx = (int) event.getX();
+                        padding = currentx - initialx;
+                    }
+
+                    if ( event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
+                    {
+                        padding = 0;
+                        initialx = 0;
+                        currentx = 0;
+                    }
+
+
+                        if(padding == 0)
+                        {
+                            //v.setBackgroundColor(0xFF000000 );
+                        }
+                        if(padding > 75)
+                        {
+                            //viewHolder.setRunning(true);
+                            TextView tv =(TextView) v.findViewById(R.id.li_tv_song);
+                            Log.d("oooo1",tv.getText().toString());
+                        }
+                        if(padding < -75)
+                        {
+                            //viewHolder.setRunning(false);
+                            TextView tv =(TextView) v.findViewById(R.id.li_tv_song);
+                            Log.d("oooo1",tv.getText().toString());
+                        }
+                        //v.setBackgroundColor(viewHolder.getColor());
+                        //viewHolder.icon.setImageResource(viewHolder.getImageId());
+                        //v.setPadding(padding, 0,0, 0);
+                    v.setPadding(padding, 0,-padding, 0);
+
+
+                    return true;
+                }
+            };
+
+        //Show Track List
+        //playListAdapter = new PlayClientAdapter(arrayPlayList);
+        playListAdapter = new CustomListAdapter (this,arrayPlayList,gestureListener);
+
+        listview.setAdapter(playListAdapter);
+
+
+
+
+
+
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+/*
         try {
 
             JsonParserObject jsonParserObject = new JsonParserObject();
             playListObject = jsonParserObject.jsonClientRegistrationResponseGetPlaylist(songs);
             tracksArrayObject =  jsonParserObject.jsonClientRegistrationResponseGetTracks(songs);
-            List<TrackObject> arrayPlayList;
+
             arrayPlayList= tracksArrayObject.getTracksList();
 
 
@@ -241,52 +386,74 @@ public class ClientActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view, int position,
                                         long id) {
                     Log.d("Swipe","onItemClick");
+
+
+
                     Message msg = new Message();
 
 
 
-                    msg.arg1 = position - 1;// If was detected swipe we delete an item
+                    msg.arg1 = position - 1;// If was detected swipe we delete an itemregisterDataSetObserve
                     if (swipeDetector.swipeDetected()){
                         if (swipeDetector.getAction() == SwipeDetector.Action.LR ||
                                 swipeDetector.getAction() == SwipeDetector.Action.LR)
                         {
+
                             ListView vwParentRow = (ListView)view.getParent();
                             RelativeLayout rl = (RelativeLayout)vwParentRow.getChildAt(position);
-                            //TextView child = (TextView)ll.getChildAt(0);
-                            //child.setText("left");
-                            //ll.setBackgroundColor(Color.RED);
-                            /*
-                            ImageView child = (ImageView)rl.getChildAt(3);
-                            child.setImageResource (R.drawable.unlikeicon);
-   */
+
+
                             TextView child_active = (TextView)rl.getChildAt(1);
                             String active =child_active.getText().toString();
                             TextView child_playing = (TextView)rl.getChildAt(2);
                             String playing =child_playing.getText().toString();
-                            //TextView child_position =(TextView)rl.getChildAt(3);
-                            //TextView child_rank =(TextView)rl.getChildAt(4);
+
                             RelativeLayout child_infos =(RelativeLayout)rl.getChildAt(5);
                             if(playing=="Y"){
+                                child_infos.invalidate();
+                                child_infos.setBackground(getResources().getDrawable(R.drawable.play_infos_like));
 
-                                child_infos.setBackgroundResource(R.drawable.play_infos_like);
+                                child_infos.invalidateDrawable((getResources().getDrawable(R.drawable.played_infos)));
+                                child_infos.invalidateDrawable((getResources().getDrawable(R.drawable.play_infos_like)));
+                                child_infos.setBackground(getResources().getDrawable(R.drawable.play_infos_like));
+                                child_infos.invalidate();
+                                //child_infos.setBackgroundResource(R.drawable.play_infos_like);
                             }
                             else if(active=="true"){
-                                child_infos.setBackgroundResource(R.drawable.to_play_infos_like);
+                                child_infos.setBackground(getResources().getDrawable(R.drawable.to_play_infos_like));
+                                child_infos.invalidate();
+                                child_infos.invalidateDrawable((getResources().getDrawable(R.drawable.to_play_infos)));
+                                child_infos.invalidateDrawable((getResources().getDrawable(R.drawable.to_play_infos_like)));
+                                //child_infos.setBackgroundResource(R.drawable.to_play_infos_like);
+                                child_infos.setBackground(getResources().getDrawable(R.drawable.to_play_infos_like));
+                                child_infos.invalidate();
 
                             }
                             else if(active=="false"){
-                                child_infos.setBackgroundResource(R.drawable.played_infos_like);
+                                child_infos.setBackground(getResources().getDrawable(R.drawable.played_infos_like));
+                                child_infos.invalidate();
+                                child_infos.invalidateDrawable((getResources().getDrawable(R.drawable.played_infos)));
+                                child_infos.invalidateDrawable((getResources().getDrawable(R.drawable.played_infos_like)));
+                                child_infos.setBackground(getResources().getDrawable(R.drawable.played_infos_like));
+                                child_infos.invalidate();
                             }
-                            playListAdapter.notifyDataSetChanged();
+                           // listview.smoothScrollToPosition(1,3);
+
+
+
+
 
                             //ImageView child = (ImageView)rl.getChildAt(3);
                             //child.setImageResource (R.drawable.ic_like);
 
                             //rl.setBackgroundResource(R.drawable.li_shape_track_ilike);
                             Log.d("muffa","like");
+
                             TextView tw = (TextView)rl.getChildAt(0);
                             Integer idTrack = Integer.parseInt( tw.getText().toString());
                             // manageUserLike.add(tw.getText().toString());
+
+
                             dbHelper.open();
                             long _id = dbHelper.createPreference("spotify", idTrack,0,1);
                             cursor = dbHelper.fetchPreferencesByFilter(idTrack);
@@ -303,11 +470,17 @@ public class ClientActivity extends Activity {
                             dbHelper.close();
 
 
-                            Log.d("muffa","like ok");
+                           // ArrayPlayList ap= ad.getItem()
+                            //arrayPlayList.get(position).setIUnLike("Y");
+                            tracksArrayObject.getTracksList().get(position).setIUnLike("Y");
+                            playListAdapter.notifyDataSetChanged();
+
+
+                            Log.d("muffa", "like ok");
                             msg.what = MSG_ANIMATION_REMOVE;
                             msg.arg2 = swipeDetector.getAction() == SwipeDetector.Action.LR ? 1 : 0;
                             msg.obj = view;
-
+                            handler.sendMessage(msg);
 
 
 
@@ -380,12 +553,6 @@ public class ClientActivity extends Activity {
                             ListView vwParentRow = (ListView)view.getParent();
                             RelativeLayout rl = (RelativeLayout)vwParentRow.getChildAt(position);
 
-                            //ll.setBackgroundColor(Color.GREEN);
-                            //ImageView child = (ImageView)ll.getChildAt(3);
-                            //child.setImageResource(R.drawable.rockandrollicon);
-                            //child.setText("right");
-                            //ImageView child = (ImageView)rl.getChildAt(3);
-                            //child.setImageResource (R.drawable.ic_dislike);
 
                             TextView child_active = (TextView)rl.getChildAt(1);
 
@@ -397,19 +564,26 @@ public class ClientActivity extends Activity {
                             if(playing=="Y"){
 
                                 child_infos.setBackgroundResource(R.drawable.play_infos_dislike);
+                                child_infos.invalidate();
+                                rl.setClickable(false);
                             }
                             else if(active=="true"){
                                 child_infos.setBackgroundResource(R.drawable.to_play_infos_dislike);
+                                child_infos.invalidate();
 
                             }
                             else if(active=="false"){
                                 child_infos.setBackgroundResource(R.drawable.played_infos_dislike);
+                                child_infos.invalidate();
                             }
 
                             playListAdapter.notifyDataSetChanged();
 
                             //rl.setBackgroundResource(R.drawable.li_shape_track_iunlike);
                             Log.d("muffa","unlike");
+
+
+
                             TextView tw = (TextView)rl.getChildAt(0);
                             //manageUserLike.add(tw.getText().toString());
                             Integer idTrack = Integer.parseInt( tw.getText().toString());
@@ -427,13 +601,15 @@ public class ClientActivity extends Activity {
                             cursor.close();
 
                             dbHelper.close();
+                            tracksArrayObject.getTracksList().get(position).setIUnLike("N");
 
+                            playListAdapter.notifyDataSetChanged();
 
                             Log.d("muffa","unlike ok");
                             msg.what = MSG_ANIMATION_REMOVE;
                             msg.arg2 = swipeDetector.getAction() == SwipeDetector.Action.RL ? 1 : 0;
                             msg.obj = view;
-
+                            handler.sendMessage(msg);
 
                             if (android.os.Build.VERSION.SDK_INT > 9) {
                                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -497,10 +673,10 @@ public class ClientActivity extends Activity {
 
                     // Otherwise, select an item
                     else
-
-                        msg.what = MSG_CHANGE_ITEM;
-                    Log.d("sssssss", Integer.toString(msg.what));
-                   // handler.sendMessage(msg);
+                    Log.d("sssssss", "dd");
+                     //   msg.what = MSG_CHANGE_ITEM;
+                    //Log.d("sssssss", Integer.toString(msg.what));
+                  // handler.sendMessage(msg);
                 }
             });
 
@@ -509,7 +685,7 @@ public class ClientActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+*/
     }
 
 /*
@@ -537,7 +713,7 @@ public class ClientActivity extends Activity {
 */
 
 
-
+/*
 
     @SuppressWarnings("unchecked")
     private void registerWithNotificationHubs() {
@@ -572,6 +748,8 @@ public class ClientActivity extends Activity {
         super.onPause();
         context.unregisterReceiver(mMessageReceiver);
     }
+
+
     //This is the handler that will manager to process the broadcast intent
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
                   @Override
@@ -641,6 +819,7 @@ public class ClientActivity extends Activity {
                     //Show Track List
                     playListAdapter = new CustomListAdapter(arrayPlayList,context);
                     listview.setAdapter(playListAdapter);
+
                     for (int i=0;i<arrayPlayList.size();i++){
                     Log.d("muffa",((Object)(arrayPlayList.get(i).getPosition())).toString());
                     Log.d("muffa",arrayPlayList.get(i).getTrackName());
@@ -683,7 +862,7 @@ public class ClientActivity extends Activity {
 
                         }
 
-*/
+
 
 
                         } catch (JSONException e) {
@@ -694,7 +873,7 @@ public class ClientActivity extends Activity {
 
 
     };
-
+*/
     public void LikeClickHandler(View v) throws JSONException {
 
         //reset all the listView items background colours
@@ -1006,4 +1185,5 @@ public class ClientActivity extends Activity {
             }
         }
     }
+
 }

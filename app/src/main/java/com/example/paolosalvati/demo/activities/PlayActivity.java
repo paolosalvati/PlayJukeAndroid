@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.net.wifi.ScanResult;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -49,7 +51,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -130,9 +134,14 @@ private Spotify spotify;
             //Get Track List to be played
             Bundle datipassati = getIntent().getExtras();
             final String songs = datipassati.getString("SONGS");
+            final String imageUri = datipassati.getString("IMAGE_URI");
             Log.d("SONGSrrr",songs);
 
-        Log.d("SONGSrrr","1");
+        ImageView playlistCover = (ImageView) findViewById(R.id.layout_palyer_imageView);
+        Drawable drawable = LoadImageFromWebOperations(imageUri);
+
+        playlistCover.setImageDrawable(drawable);
+
             SERVICE_URI = getApplication().getString(R.string.azure_wcf_service_uri);
 
             //Set SeekBar for track's play progress
@@ -161,9 +170,9 @@ private Spotify spotify;
             playlistTitle.setText(playListObject.getPlaylistName());
 
            //Show Track List
-            playListAdapter = new PlayAdapter(arrayPlayList);
-            playlistView = (ListView) findViewById(R.id.tracks);
-            playlistView.setAdapter(playListAdapter);
+            //playListAdapter = new PlayAdapter(arrayPlayList);
+           //tolto playlistView = (ListView) findViewById(R.id.tracks);
+            //playlistView.setAdapter(playListAdapter);
 
 
             } catch (JSONException e) {
@@ -258,7 +267,7 @@ private Spotify spotify;
                    }
                     else{
                        json.put("mac", userObject.getMac());
-                       json.put("trackid",1011);// arrayPlayList.get(trackPos).getId());
+                       json.put("trackid",arrayPlayList.get(trackPos).getId());
                        json.put("plistid",  1158 );
                    }
 
@@ -398,9 +407,9 @@ private Spotify spotify;
                     playlistTitle.setText(playListObject.getPlaylistName());
 
                     //Show Track List
-                    playListAdapter = new PlayAdapter(arrayPlayList);
-                    playlistView = (ListView) findViewById(R.id.tracks);
-                    playlistView.setAdapter(playListAdapter);
+                    //playListAdapter = new PlayAdapter(arrayPlayList);
+                   //tolto playlistView = (ListView) findViewById(R.id.tracks);
+                    //playlistView.setAdapter(playListAdapter);
 
 
                     /*DA SPOSTARE NEL PLAYER....fine
@@ -513,5 +522,16 @@ private Spotify spotify;
         Spotify.destroyPlayer(this);
         super.onDestroy();
     }
-
+    public Drawable LoadImageFromWebOperations(String url)
+    {
+        try
+        {
+            InputStream is = (InputStream) new URL(url).getContent();
+            Drawable d = Drawable.createFromStream(is, "src name");
+            return d;
+        }catch (Exception e) {
+            System.out.println("Exc="+e);
+            return null;
+        }
+    }
 }
